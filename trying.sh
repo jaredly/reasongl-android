@@ -35,7 +35,6 @@ if [ -z "segfaulted" ]; then
 fi
 
 
-# latest attempt
 if [ -z "wunno" ]; then
   echo "static compile now"
   ocamlfind -toolchain android ocamlopt -linkpkg -output-obj -cclib -shared helloworld.ml -o libhelloworld.o
@@ -55,15 +54,37 @@ fi
 # http://www.learnopengles.com/developing-a-simple-game-of-air-hockey-using-c-and-opengl-es-2-for-android-ios-and-the-web/
 # http://www.learnopengles.com/calling-opengl-from-android-using-the-ndk/
 
-if [ -z "" ]; then
+if [ -z "waaaa" ]; then
   echo "static compile maybe - complete-object"
-  ocamlfind -toolchain android ocamlopt -g -linkpkg     -ccopt -fno-omit-frame-pointer -ccopt -fPIC -linkall -runtime-variant _pic -output-obj -verbose   -output-complete-obj helloworld.ml libasmrun.a -o libhelloworld.o
+  cp 32bit/android-sysroot/lib/ocaml/libasmrun.a ./
+  ocamlfind -toolchain android ocamlopt -g -linkpkg \
+    -ccopt -fno-omit-frame-pointer \
+    -linkall \
+    -ccopt -fPIC \
+    -runtime-variant _pic \
+    -output-complete-obj \
+    -output-obj \
+    -verbose   \
+    helloworld.ml -o libhelloworld.o
+  cp libhelloworld.o android-ndk/hello-libs/distribution/reasongl/lib/armeabi-v7a
+  cp libasmrun.a android-ndk/hello-libs/distribution/reasongl/lib/armeabi-v7a
+
   # cp libasmrun.a libreasongl.a
   # ar -r libreasongl.a libhelloworld.o
   # ~/.opam/4.04.0+32bit/android-ndk/toolchains/aarch64-linux-android-4.9/prebuilt/darwin-x86_64/bin/aarch64-linux-android-ranlib libreasongl.a
   # cp libreasongl.a android-ndk/hello-libs/distribution/reasongl/lib/arm64-v8a
-  cp libhelloworld.o android-ndk/hello-libs/distribution/reasongl/lib/arm64-v8a
-  cp libasmrun.a android-ndk/hello-libs/distribution/reasongl/lib/arm64-v8a
 fi
 
 
+if [ -z "" ]; then
+  echo "static compile now"
+  ocamlfind -toolchain android ocamlopt -linkpkg -output-obj -cclib -shared helloworld.ml -o libhelloworld.o
+  cp libasmrun.a libreasongl.a
+  ar -r libreasongl.a libhelloworld.o
+  # cp libhelloworld.o libreasongl.o
+  ~/.opam/4.04.0+32bit/android-ndk/toolchains/aarch64-linux-android-4.9/prebuilt/darwin-x86_64/bin/aarch64-linux-android-ranlib libreasongl.a
+  cp libreasongl.a android-ndk/hello-libs/distribution/reasongl/lib/armeabi-v7a
+  # cp libreasongl.o android-ndk/hello-libs/distribution/reasongl/lib/arm64-v8a
+  # cp libasmrun.a android-ndk/hello-libs/distribution/reasongl/lib/arm64-v8a
+  # cp libasmrun.a android-ndk/hello-libs/distribution/reasongl/lib/arm64-v8a
+fi
