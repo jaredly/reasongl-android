@@ -9,7 +9,7 @@ opam pin add -y topkg https://github.com/whitequark/topkg.git
 opam remove -y conf-android
 ARCH=arm SUBARCH=armv7 SYSTEM=linux_eabi \
   CCARCH=arm TOOLCHAIN=arm-linux-androideabi-4.9 \
-  TRIPLE=arm-linux-androideabi LEVEL=22 \
+  TRIPLE=arm-linux-androideabi LEVEL=24 \
   STLVER=4.9 STLARCH=armeabi \
   opam install -y conf-android
 

@@ -1,0 +1,9 @@
+android-ndk
+*.byte
+*.cmi
+*.cmx
+*.cmo
+*.o
+*.native
+*.a
+*.so
