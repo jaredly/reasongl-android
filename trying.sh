@@ -35,7 +35,10 @@ if [ -z "segfaulted" ]; then
 fi
 
 
-if [ -z "wunno" ]; then
+if [ -z "olddddd 64 fakery" ]; then
+  opam switch 4.04.0+32bit
+  eval `opam config env`
+  cp android-sysroot-arm64/lib/ocaml/libasmrun.a ./
   echo "static compile now"
   ocamlfind -toolchain android ocamlopt -linkpkg -output-obj -cclib -shared helloworld.ml -o libhelloworld.o
   cp libasmrun.a libreasongl.a
@@ -76,7 +79,7 @@ if [ -z "waaaa" ]; then
 fi
 
 
-if [ -z "" ]; then
+if [ -z "aa" ]; then
   echo "static compile now"
   ocamlfind -toolchain android ocamlopt -linkpkg -output-obj -cclib -shared helloworld.ml -o libhelloworld.o
   cp libasmrun.a libreasongl.a
@@ -88,3 +91,18 @@ if [ -z "" ]; then
   # cp libasmrun.a android-ndk/hello-libs/distribution/reasongl/lib/arm64-v8a
   # cp libasmrun.a android-ndk/hello-libs/distribution/reasongl/lib/arm64-v8a
 fi
+
+
+if [ -z "" ]; then
+  opam switch 4.04.0-android32
+  eval `opam config env`
+  echo "static compile maybe"
+  cp 32bit/android-sysroot/lib/ocaml/libasmrun.a ./
+  ocamlfind -toolchain android ocamlopt -linkpkg -output-obj helloworld.ml libasmrun.a 32bit/android-sysroot/lib/ocaml/stdlib.a -o libhelloworld.o
+  cp libasmrun.a libreasongl.a
+  ar -r libreasongl.a libhelloworld.o
+  ~/.opam/4.04.0-android32/android-ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/darwin-x86_64/bin/arm-linux-androideabi-ranlib libreasongl.a
+  cp libreasongl.a android-ndk/hello-libs/distribution/reasongl/lib/armeabi-v7a/
+  # cp libasmrun.a android-ndk/hello-libs/distribution/reasongl/lib/arm64-v8a
+fi
+

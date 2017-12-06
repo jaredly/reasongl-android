@@ -38,12 +38,12 @@ set_target_properties(lib_gperf PROPERTIES IMPORTED_LOCATION
 
 add_library(lib_reasongl STATIC IMPORTED)
 set_target_properties(lib_reasongl PROPERTIES IMPORTED_LOCATION
-    ${distribution_DIR}/reasongl/lib/${ANDROID_ABI}/libhelloworld.o)
+    ${distribution_DIR}/reasongl/lib/${ANDROID_ABI}/libreasongl.a)
 
 
-add_library(lib_asmrun STATIC IMPORTED)
-set_target_properties(lib_asmrun PROPERTIES IMPORTED_LOCATION
-    ${distribution_DIR}/reasongl/lib/${ANDROID_ABI}/libasmrun.a)
+# add_library(lib_asmrun STATIC IMPORTED)
+# set_target_properties(lib_asmrun PROPERTIES IMPORTED_LOCATION
+    # ${distribution_DIR}/reasongl/lib/${ANDROID_ABI}/libasmrun.a)
 
 
 # add_library(lib_reasongl SHARED IMPORTED)
@@ -73,5 +73,5 @@ target_link_libraries(hello-libs
                       lib_gmath
                       lib_gperf
                       lib_reasongl
-                      lib_asmrun
+                      # lib_asmrun
                       log)
