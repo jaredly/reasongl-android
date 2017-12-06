@@ -52,7 +52,7 @@ Java_com_example_hellolibs_MainActivity_stringFromJNI(JNIEnv *env, jobject thiz)
     ticks = GetTicks() - ticks;
 
 //    if (gpower(100) > 100) {
-        char* args[] = {"awesome", 0};
+    char* args[] = {0};
     caml_startup(args);
 //    }
 
