@@ -102,7 +102,8 @@ if [ -z "" ]; then
   cp libasmrun.a libreasongl.a
   ar -r libreasongl.a libhelloworld.o
   ~/.opam/4.04.0-android32/android-ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/darwin-x86_64/bin/arm-linux-androideabi-ranlib libreasongl.a
-  cp libreasongl.a android-ndk/hello-libs/distribution/reasongl/lib/armeabi-v7a/
+  mkdir -p demos/hello-libs/distribution/reasongl/lib/armeabi-v7a
+  cp libreasongl.a demos/hello-libs/distribution/reasongl/lib/armeabi-v7a/
   # cp libasmrun.a android-ndk/hello-libs/distribution/reasongl/lib/arm64-v8a
 fi
 
