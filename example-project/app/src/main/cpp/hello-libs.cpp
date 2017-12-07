@@ -38,9 +38,6 @@ Java_com_example_hellolibs_MainActivity_stringFromJNI(JNIEnv *env, jobject thiz)
     // another thread...
     auto ticks = GetTicks();
 
-    char* args[] = {0};
-    caml_startup(args);
-
     for (auto exp = 0; exp < 32; ++exp) {
         volatile unsigned val = gpower(exp);
         (void) val;  // to silence compiler warning
@@ -49,5 +46,6 @@ Java_com_example_hellolibs_MainActivity_stringFromJNI(JNIEnv *env, jobject thiz)
 
     LOGI("calculation time: %" PRIu64, ticks);
 
-    return env->NewStringUTF("Hello from JNI my folks!");
+    char* input = "hello from the jni right here";
+    return env->NewStringUTF(reasongl_echo(input));
 }
