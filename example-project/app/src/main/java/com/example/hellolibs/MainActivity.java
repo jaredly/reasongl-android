@@ -14,6 +14,6 @@ public class MainActivity extends Activity {
     }
     public native String  stringFromC();
     static {
-        System.loadLibrary("hello-libs");
+        System.loadLibrary("reasongl");
     }
 }

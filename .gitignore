@@ -12,3 +12,4 @@ android-sysroot
 build
 example-project/.gradle
 .externalNativeBuild
+example-project/.idea
