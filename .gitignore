@@ -7,3 +7,8 @@ android-ndk
 *.native
 *.a
 *.so
+old
+android-sysroot
+build
+example-project/.gradle
+.externalNativeBuild
