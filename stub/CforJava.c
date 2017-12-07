@@ -10,37 +10,43 @@
 
 #include <jni.h>
 
-#define LOGI(...) \
-  ((void)__android_log_print(ANDROID_LOG_INFO, "hello-libs::", __VA_ARGS__))
-
 #define JNI_METHOD(returnType, name) JNIEXPORT returnType JNICALL Java_com_example_hellolibs_OCamlBindings_ ## name
 
-/************ C <-> OCaml ***************
-char * reasongl_echo(char *buf) {
-    static value * func = NULL;
-    if (func == NULL) func = caml_named_value("echo");
-    caml_callback(*caml_named_value("sayhi"), caml_copy_string("from echo"));
-    value v = caml_callback(*func, caml_copy_string(buf));
-    return String_val(v);
-}
+#define CALL_OCAML_FN(name, arg) static value *ocaml_fn = NULL; \
+  if (ocaml_fn == NULL) ocaml_fn = caml_named_value(name); \
+  caml_callback(*ocaml_fn, arg);
 
-************ C <-> Java ***************
-JNI_METHOD(jstring, stringFromC)(JNIEnv *env, jobject thiz) {
-    return (*env)->NewStringUTF(env, reasongl_echo("This is CforJava.c"));
-}
-*/
+#define CALL_OCAML_FN2(name, arg1, arg2) static value *ocaml_fn = NULL; \
+  if (ocaml_fn == NULL) ocaml_fn = caml_named_value(name); \
+  caml_callback2(*ocaml_fn, arg1, arg2);
 
 
 /************ OCaml <-> C <-> Java ***************/
-JNI_METHOD(jstring, stringFromC)(JNIEnv *env, jobject thiz) {
-    static value * func = NULL;
-    if (func == NULL) func = caml_named_value("echo");
 
-    char *buf = "This is CforJava.c";
-    value v = caml_callback(*func, caml_copy_string(buf));
+// passing objects around https://stackoverflow.com/questions/2504334/passing-data-types-from-java-to-c-or-vice-versa-using-jni
 
-    return (*env)->NewStringUTF(env, String_val(v));
+JNI_METHOD(void, reasonglMain)(JNIEnv* env, jobject obj, jobject glView) {
+  CAMLparam0();
+  CAMLlocal1(ocamlView);
+  ocamlView = caml_alloc_small(1, 0);
+  Field(ocamlView, 0) = (long)glView;
+  // CALL_OCAML_FN("reasonglMain", ocamlView);
+  CAMLreturn0;
 }
 
+JNI_METHOD(void, reasonglUpdate)(JNIEnv* env, jobject obj, jdouble timeSinceLastDraw) {
+  CALL_OCAML_FN("reasonglUpdate", caml_copy_double(timeSinceLastDraw));
+}
 
+JNI_METHOD(void, reasonglTouchPress)(JNIEnv* env, jobject obj, jdouble x, jdouble y) {
+  CALL_OCAML_FN2("reasonglTouchPress", caml_copy_double(x), caml_copy_double(y));
+}
+
+JNI_METHOD(void, reasonglTouchDrag)(JNIEnv* env, jobject obj, jdouble x, jdouble y) {
+  CALL_OCAML_FN2("reasonglTouchDrag", caml_copy_double(x), caml_copy_double(y));
+}
+
+JNI_METHOD(void, reasonglTouchRelease)(JNIEnv* env, jobject obj, jdouble x, jdouble y) {
+  CALL_OCAML_FN2("reasonglTouchRelease", caml_copy_double(x), caml_copy_double(y));
+}
 
