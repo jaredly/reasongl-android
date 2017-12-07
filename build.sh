@@ -17,10 +17,12 @@ cp stub/* build/stub
 
 OCAMLOPT="$SYSROOT/bin/ocamlopt -ccopt -fno-omit-frame-pointer -ccopt -O3 -ccopt -fPIC -I build/src -I build/stub -I $SYSROOT/lib/ocaml -runtime-variant _pic"
 
+REFMT=~/.opam/4.04.2/bin/refmt
+
 # Compile to a .o
-$OCAMLOPT -c -o build/stub/Capi.cmx build/stub/Capi.ml
+$OCAMLOPT -c -o build/stub/Capi.cmx -pp "$REFMT --print binary" -impl build/stub/Capi.re
 $OCAMLOPT -c -o build/src/App.cmx build/src/App.ml
-$OCAMLOPT -c -o build/stub/MLforJava.cmx build/stub/MLforJava.ml
+$OCAMLOPT -c -o build/stub/MLforJava.cmx -pp "$REFMT --print binary" -impl build/stub/MLforJava.re
 
 $OCAMLOPT -ccopt -std=c11 -c build/stub/CforJava.c
 mv CforJava.o build/stub

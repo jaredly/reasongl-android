@@ -14,11 +14,13 @@
 
 #define CALL_OCAML_FN(name, arg) static value *ocaml_fn = NULL; \
   if (ocaml_fn == NULL) ocaml_fn = caml_named_value(name); \
-  caml_callback(*ocaml_fn, arg);
+  if (ocaml_fn == NULL) __android_log_print(ANDROID_LOG_WARN, "reasongl", "Function not assigned %s", name); \
+  else caml_callback(*ocaml_fn, arg);
 
 #define CALL_OCAML_FN2(name, arg1, arg2) static value *ocaml_fn = NULL; \
   if (ocaml_fn == NULL) ocaml_fn = caml_named_value(name); \
-  caml_callback2(*ocaml_fn, arg1, arg2);
+  if (ocaml_fn == NULL) __android_log_print(ANDROID_LOG_WARN, "reasongl", "Function not assigned %s", name); \
+  else caml_callback2(*ocaml_fn, arg1, arg2);
 
 
 /************ OCaml <-> C <-> Java ***************/
@@ -27,10 +29,20 @@
 
 JNI_METHOD(void, reasonglMain)(JNIEnv* env, jobject obj, jobject glView) {
   CAMLparam0();
-  CAMLlocal1(ocamlView);
-  ocamlView = caml_alloc_small(1, 0);
-  Field(ocamlView, 0) = (long)glView;
-  // CALL_OCAML_FN("reasonglMain", ocamlView);
+  CAMLlocal1(ocamlWindow);
+  ocamlWindow = caml_alloc_small(2, 0);
+  Field(ocamlWindow, 0) = (long)env;
+  Field(ocamlWindow, 1) = (long)glView;
+
+  /*
+  jclass viewClass = (*env)->GetObjectClass(env, glView);
+  jmethodID getHeight = (*env)->GetMethodID(env, viewClass, "getHeight", "()I");
+  int height =  (*env)->CallIntMethod(env, glView, getHeight);
+
+  __android_log_print(ANDROID_LOG_INFO, "reasongl", "OCAML Hight %d", height);
+  */
+
+  CALL_OCAML_FN("reasonglMain", ocamlWindow);
   CAMLreturn0;
 }
 

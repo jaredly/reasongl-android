@@ -26,3 +26,27 @@ void logAndroid(value text) {
   __android_log_print(ANDROID_LOG_INFO, "reasongl", str_text);
 }
 
+CAMLprim value getWindowHeight(value ocamlWindow) {
+  CAMLparam1(ocamlWindow);
+  JNIEnv* env = (JNIEnv*)(void *)Field(ocamlWindow, 0);
+  jobject glView = (jobject)(void *)Field(ocamlWindow, 1);
+
+  jclass viewClass = (*env)->GetObjectClass(env, glView);
+  jmethodID getHeight = (*env)->GetMethodID(env, viewClass, "getHeight", "()I");
+  int height =  (*env)->CallIntMethod(env, glView, getHeight);
+
+  CAMLreturn(Val_int(height));
+}
+
+CAMLprim value getWindowWidth(value ocamlWindow) {
+  CAMLparam1(ocamlWindow);
+  JNIEnv* env = (JNIEnv*)(void *)Field(ocamlWindow, 0);
+  jobject glView = (jobject)(void *)Field(ocamlWindow, 1);
+
+  jclass viewClass = (*env)->GetObjectClass(env, glView);
+  jmethodID getHeight = (*env)->GetMethodID(env, viewClass, "getWidth", "()I");
+  int height =  (*env)->CallIntMethod(env, glView, getHeight);
+
+  CAMLreturn(Val_int(height));
+}
+

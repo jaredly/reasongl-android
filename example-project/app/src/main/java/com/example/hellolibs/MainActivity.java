@@ -3,6 +3,7 @@ package com.example.hellolibs;
 import android.app.Activity;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.os.SystemClock;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -13,6 +14,7 @@ public class MainActivity extends Activity {
 
     private static class Renderer implements GLSurfaceView.Renderer {
         OCamlBindings bindings = new OCamlBindings();
+        long lastDrawTime = SystemClock.elapsedRealtimeNanos();
         GLSurfaceView view;
 
         public Renderer(GLSurfaceView view) {
@@ -20,10 +22,15 @@ public class MainActivity extends Activity {
 
             this.view = view;
             view.setRenderer(this);
+            //https://stackoverflow.com/questions/8141209/android-setheight-of-glsurfaceview
         }
 
         public void onDrawFrame(GL10 gl) {
-            bindings.reasonglUpdate(1.0);
+            SystemClock.elapsedRealtime();
+            long now = SystemClock.elapsedRealtimeNanos();
+            long elapsed = now - lastDrawTime;
+            bindings.reasonglUpdate(elapsed / 1000.0);
+            lastDrawTime = now;
         }
 
         public void onSurfaceChanged(GL10 gl, int width, int height) {
