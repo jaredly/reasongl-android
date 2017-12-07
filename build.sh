@@ -9,6 +9,7 @@ eval `opam config env`
 
 set -ex
 
+rm -rf build
 mkdir -p build/src build/stub
 
 cp src/* build/src
@@ -17,20 +18,22 @@ cp stub/* build/stub
 OCAMLOPT="$SYSROOT/bin/ocamlopt -ccopt -fno-omit-frame-pointer -ccopt -O3 -ccopt -fPIC -I build/src -I build/stub -I $SYSROOT/lib/ocaml -runtime-variant _pic"
 
 # Compile to a .o
-$OCAMLOPT -c -o build/src/Hello.cmx build/src/Hello.ml
-$OCAMLOPT -c -o build/stub/bindings.cmx build/stub/bindings.ml
-$OCAMLOPT -ccopt -std=c11 -c build/stub/hello.c
-mv hello.o build/stub/hello.o
+$OCAMLOPT -c -o build/src/App.cmx build/src/App.ml
+$OCAMLOPT -c -o build/stub/MLforJava.cmx build/stub/MLforJava.ml
 
-$OCAMLOPT -output-obj -ccopt -llog -ccopt -landroid -o libhelloworld.so build/src/Hello.cmx build/stub/hello.o build/stub/bindings.cmx $SYSROOT/lib/ocaml/libasmrun.a
+$OCAMLOPT -ccopt -std=c11 -c build/stub/CforJava.c
+mv CforJava.o build/stub
+$OCAMLOPT -ccopt -std=c11 -c build/stub/CforOCaml.c
+mv CforOCaml.o build/stub
 
-# Connect with the runtime
-# cp $SYSROOT/lib/ocaml/libasmrun.a libreasongl.a
-# $NDK_BIN/ar -r libreasongl.a libhelloworld.o build/stub/hello.o
-# $NDK_BIN/ranlib libreasongl.a
+$OCAMLOPT -output-obj -ccopt -llog -ccopt -landroid \
+  -o libfrom_ocaml.so \
+  build/src/App.cmx \
+  build/stub/CforOCaml.o build/stub/CforJava.o \
+  build/stub/MLforJava.cmx \
+  $SYSROOT/lib/ocaml/libasmrun.a
 
 # Move into our android project
 mkdir -p $DEST
-cp libhelloworld.so $DEST/libreasongl.so
-cp $SYSROOT/lib/ocaml/libasmrun_shared.so $DEST
+cp libfrom_ocaml.so $DEST/libreasongl.so
 
