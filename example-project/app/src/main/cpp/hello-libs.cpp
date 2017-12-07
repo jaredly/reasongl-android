@@ -7,5 +7,6 @@
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_example_hellolibs_MainActivity_stringFromJNI(JNIEnv *env, jobject thiz) {
     char* input = "hello from the jni right here";
-    return env->NewStringUTF(reasongl_echo(input));
+    dummy();
+    return env->NewStringUTF(input);
 }

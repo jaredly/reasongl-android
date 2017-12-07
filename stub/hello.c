@@ -50,6 +50,10 @@ char * reasongl_echo(char *buf) {
     return String_val(v);
 }
 
+// this is just to make sure we get loaded
+// it's a dumb hack.
+int dummy () { return 10; }
+
 // Init the runtime
 __attribute__ ((__constructor__))
 void reasongl_init(void) {

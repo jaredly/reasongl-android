@@ -1,10 +1,7 @@
 #pragma once
 
 #ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
+extern "C"
+#endif
+int dummy();
 
-char* reasongl_echo(char *str);
-#ifdef __cplusplus
-}
-#endif // __cplusplus
