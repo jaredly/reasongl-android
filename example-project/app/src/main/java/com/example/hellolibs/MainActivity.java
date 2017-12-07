@@ -28,10 +28,11 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         TextView tv = new TextView(this);
-        tv.setText( "stuff!" + stringFromJNI() );
+        tv.setText( "stuff!" + stringFromC() );
         setContentView(tv);
     }
-    public native String  stringFromJNI();
+//    public native String  stringFromJNI();
+    public native String  stringFromC();
     static {
         System.loadLibrary("hello-libs");
     }

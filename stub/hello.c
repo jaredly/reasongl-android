@@ -9,8 +9,37 @@
 
 #include <android/log.h>
 
+
+#include <jni.h>
+
 #define LOGI(...) \
   ((void)__android_log_print(ANDROID_LOG_INFO, "hell-libs::", __VA_ARGS__))
+
+
+
+
+
+
+
+JNIEXPORT jstring JNICALL
+Java_com_example_hellolibs_MainActivity_stringFromC(JNIEnv *env, jobject thiz) {
+
+    LOGI("here in c land");
+
+    char* input = "This is hello.c";
+    return (*env)->NewStringUTF(env, input);
+}
+
+
+
+
+
+
+
+
+
+
+
 
 // C stub, notice how we copy values into OCaml and copy it out
 char * reasongl_echo(char *buf) {

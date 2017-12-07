@@ -19,23 +19,11 @@ include $(CLEAR_VARS)
 # config distributed lib path
 EXT_LIB_ROOT := $(LOCAL_PATH)/../../../../distribution
 
-# import 2 libs: remember to generate them SEPARATELY in terminal/command line first!
-LOCAL_MODULE := local_gmath
-LOCAL_SRC_FILES := $(EXT_LIB_ROOT)/gmath/lib/$(TARGET_ARCH_ABI)/libgmath.a
-LOCAL_EXPORT_C_INCLUDES := $(EXT_LIB_ROOT)/gmath/include
-include $(PREBUILT_STATIC_LIBRARY)
-
 include $(CLEAR_VARS)
 LOCAL_MODULE := local_reasongl
 LOCAL_SRC_FILES := $(EXT_LIB_ROOT)/reasongl/lib/$(TARGET_ARCH_ABI)/libreasongl.a
 LOCAL_EXPORT_C_INCLUDES := $(EXT_LIB_ROOT)/reasongl/include
 include $(PREBUILT_STATIC_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := local_gperf
-LOCAL_SRC_FILES := $(EXT_LIB_ROOT)/gperf/lib/$(TARGET_ARCH_ABI)/libgperf.so
-LOCAL_EXPORT_C_INCLUDES := $(EXT_LIB_ROOT)/gperf/include
-include $(PREBUILT_SHARED_LIBRARY)
 
 # build our app's shared lib
 include $(CLEAR_VARS)
@@ -44,8 +32,7 @@ LOCAL_MODULE    := hello-libs
 LOCAL_SRC_FILES := hello-libs.cpp
 LOCAL_LDLIBS    := -llog -landroid
 LOCAL_ALLOW_UNDEFINED_SYMBOLS := true
-LOCAL_STATIC_LIBRARIES := local_gmath local_reasongl
-LOCAL_SHARED_LIBRARIES := local_gperf
+LOCAL_STATIC_LIBRARIES := local_reasongl
 
 include $(BUILD_SHARED_LIBRARY)
 
