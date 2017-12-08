@@ -7,31 +7,30 @@ eval `opam config env`
 set -ex
 
 rm -rf build
-mkdir -p build/src build/stub
+mkdir -p build/src build/src
 
 cp src/* build/src
-cp stub/* build/stub
+# cp src/* build/src
 
-OCAMLOPT="$SYSROOT/bin/ocamlopt -ccopt -fno-omit-frame-pointer -ccopt -O3 -ccopt -fPIC -I build/src -I build/stub -I $SYSROOT/lib/ocaml -runtime-variant _pic"
+OCAMLOPT="$SYSROOT/bin/ocamlopt -ccopt -fno-omit-frame-pointer -ccopt -O3 -ccopt -fPIC -I build/src -I build/src -I $SYSROOT/lib/ocaml -runtime-variant _pic"
 
 REFMT=~/.opam/4.04.2/bin/refmt
 
 # Compile to a .o
-$OCAMLOPT -c -o build/stub/Capi.cmx -pp "$REFMT --print binary" -impl build/stub/Capi.re
-$OCAMLOPT -c -o build/src/App.cmx -pp "$REFMT --print binary" -impl build/src/App.re
-$OCAMLOPT -c -o build/stub/MLforJava.cmx -pp "$REFMT --print binary" -impl build/stub/MLforJava.re
+$OCAMLOPT -c -o build/src/Capi.cmx -pp "$REFMT --print binary" -impl build/src/Capi.re
+# $OCAMLOPT -c -o build/src/App.cmx -pp "$REFMT --print binary" -impl build/src/App.re
+$OCAMLOPT -c -o build/src/MLforJava.cmx -pp "$REFMT --print binary" -impl build/src/MLforJava.re
 
-$OCAMLOPT -ccopt -std=c11 -c build/stub/CforJava.c
-mv CforJava.o build/stub
-$OCAMLOPT -ccopt -std=c11 -c build/stub/CforOCaml.c
-mv CforOCaml.o build/stub
+$OCAMLOPT -ccopt -std=c11 -c build/src/CforJava.c
+mv CforJava.o build/src
+$OCAMLOPT -ccopt -std=c11 -c build/src/CforOCaml.c
+mv CforOCaml.o build/src
 
 $OCAMLOPT -output-obj -ccopt -fPIC -ccopt -pie -ccopt -llog -ccopt -landroid \
   -o libfrom_ocaml.so \
-  build/stub/Capi.cmx \
-  build/src/App.cmx \
-  build/stub/CforOCaml.o build/stub/CforJava.o \
-  build/stub/MLforJava.cmx \
+  build/src/Capi.cmx \
+  build/src/CforOCaml.o build/src/CforJava.o \
+  build/src/MLforJava.cmx \
   $SYSROOT/lib/ocaml/libasmrun.a
 
 # Move into our android project
@@ -39,4 +38,4 @@ DEST=example-project/app/src/main/jniLibs/armeabi-v7a
 mkdir -p $DEST
 mv libfrom_ocaml.so $DEST/libreasongl.so
 
-Java_com_example_hellolibs_OCamlBindings_reasonglMain
+# Java_com_example_hellolibs_OCamlBindings_reasonglMain
