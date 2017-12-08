@@ -166,37 +166,18 @@ let module Gl
   type imageT = {
     width: int,
     height: int,
-    channels: int,
-    data: Bigarray.Array1.t(int, Bigarray.int8_unsigned_elt, Bigarray.c_layout)
+    bitmap: Capi.bitmap,
   };
   let getImageWidth = (image) => image.width;
   let getImageHeight = (image) => image.height;
 
   let loadImage = (~context: Capi.window, ~filename: string, ~loadOption=?, ~callback: option(imageT) => unit, unit) => {
-    let i = Bindings.loadImage(~context, ~filename);
-    switch (i) {
-    | Some(i) => {
-      Capi.logAndroid("Top: " ++ string_of_int(Bigarray.Array1.get(i.data, 0)));
-      Capi.logAndroid("Top: " ++ string_of_int(Bigarray.Array1.get(i.data, 1)));
-      Capi.logAndroid("Top: " ++ string_of_int(Bigarray.Array1.get(i.data, 2)));
-      Capi.logAndroid("Top: " ++ string_of_int(Bigarray.Array1.get(i.data, 3)));
-      Capi.logAndroid("Top: " ++ string_of_int(Bigarray.Array1.get(i.data, 4)));
-    }
-    | _ => ()
-    };
-    callback(i)
+    callback(Bindings.loadImage(~context, ~filename))
   };
 
-  let texImage2DWithImage = (~context, ~target, ~level, ~image) =>
-    texImage2D_RGBA(
-      ~context,
-      ~target,
-      ~level,
-      ~width=image.width,
-      ~height=image.height,
-      ~border=0,
-      ~data=image.data
-  );
+  let texImage2DWithImage = (~context, ~target, ~level, ~image) => {
+    Capi.texImage2DWithBitmap(~context, ~target, ~level, ~bitmap=image.bitmap, ~border=0);
+  };
 
   let vertexAttribDivisor = (~context: contextT, ~attribute: attributeT, ~divisor: int) => failwith("OpenGL ES 2.0 Doesn't support vertexattribdivisor");
 
