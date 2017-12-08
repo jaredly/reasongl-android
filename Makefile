@@ -44,6 +44,7 @@ RE_FILES_PATH=\
 app:: TestReason
 
 install: TestReason
+	cp assets/* example-project/app/src/main/assets/
 	cd example-project && ./gradlew installDebug
 
 bigarray.o:

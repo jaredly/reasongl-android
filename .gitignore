@@ -14,3 +14,4 @@ example-project/.gradle
 .externalNativeBuild
 example-project/.idea
 matchenv.ppx
+example-project/app/src/main/assets/

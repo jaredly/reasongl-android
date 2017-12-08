@@ -86,7 +86,7 @@ CAMLprim loadImage(value ocamlWindow, value filename) {
     CAMLreturn(Val_none);
   }
 
-  (*g_env)->NewGlobalRef(g_env, png);
+  (*g_env)->NewLocalRef(g_env, png);
 
   /* Get image dimensions */
   jmethodID getBitmapWidth = (*g_env)->GetMethodID(g_env, cls, "getBitmapWidth", "(Landroid/graphics/Bitmap;)I");
@@ -96,7 +96,7 @@ CAMLprim loadImage(value ocamlWindow, value filename) {
 
   /* Get pixels */
   jintArray array = (*g_env)->NewIntArray(g_env, width * height);
-  (*g_env)->NewGlobalRef(g_env, array);
+  (*g_env)->NewLocalRef(g_env, array);
   jmethodID getBitmapPixels = (*g_env)->GetMethodID(g_env, cls, "getBitmapPixels", "(Landroid/graphics/Bitmap;[I)V");
   (*g_env)->CallVoidMethod(g_env, g_pngmgr, getBitmapPixels, png, array);
 
@@ -120,12 +120,12 @@ CAMLprim loadImage(value ocamlWindow, value filename) {
 
 
   (*g_env)->ReleaseIntArrayElements(g_env, array, pixels, 0);
-  (*g_env)->DeleteGlobalRef(g_env, array);
+  (*g_env)->DeleteLocalRef(g_env, array);
 
   /* Free image */
   jmethodID closeBitmap = (*g_env)->GetMethodID(g_env, cls, "closeBitmap", "(Landroid/graphics/Bitmap;)V");
   (*g_env)->CallVoidMethod(g_env, g_pngmgr, closeBitmap, png);
-  (*g_env)->DeleteGlobalRef(g_env, png);
+  (*g_env)->DeleteLocalRef(g_env, png);
 
 
 

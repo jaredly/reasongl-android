@@ -44,7 +44,7 @@ let setup = (env) => {
   let lst = Array.init(50, (_) => make(Env.width(env), ((-500), (-50)), 0));
   {
     lst, time: 0, running: true,
-    background: Reprocessing.Draw.loadImage(~filename="background.png", env),
+    background: Reprocessing.Draw.loadImage(~filename="flappy.png", env),
     /* flappy: Reprocessing.Draw.loadImage(~filename="flappy-base.png", env), */
     pos: (100, 100),
   }
@@ -77,8 +77,8 @@ let draw = ({lst, running, time, pos} as state, env) => {
     },
     lst
   );
-  /* Draw.image(state.background, ~pos=(0, 0), env);
-  Draw.image(state.flappy, ~pos=pos, env); */
+  Draw.image(state.background, ~pos=(0, 0), env);
+  /* Draw.image(state.flappy, ~pos=pos, env); */
   {...state, lst, running, time: running ? time + 1 : time}
 };
 
