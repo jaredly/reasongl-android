@@ -7,7 +7,7 @@ CURDIR = $(shell pwd)
 OCAMLDIR = ~/.opam/4.04.0-android32/android-sysroot
 OCAMLBIN = $(OCAMLDIR)/bin/ocamlopt
 
-OCAMLOPT=BSB_BACKEND=native-android $(OCAMLBIN) -ccopt -fno-omit-frame-pointer -ccopt -O3 -ccopt -fPIC \
+OCAMLOPT=BSB_BACKEND=native-android $(OCAMLBIN) -g -ccopt -fno-omit-frame-pointer -ccopt -O3 -ccopt -fPIC \
 	-I Build/src \
 	-I Build/app \
 	-I Build/reasongl-interface/src \
@@ -43,6 +43,9 @@ RE_FILES_PATH=\
 
 app:: TestReason
 
+install: TestReason
+	cd example-project && ./gradlew installDebug
+
 bigarray.o:
 	$(OCAMLDIR)/../android-ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/darwin-x86_64/arm-linux-androideabi/bin/ar -x $(OCAMLDIR)/lib/ocaml/bigarray.a
 	mv bigarray.o $(OCAMLDIR)/lib/ocaml/
@@ -58,7 +61,7 @@ DEST=example-project/app/src/main/jniLibs/armeabi-v7a
 
 TestReason: matchenv.ppx Build $(C_FILES_PATH) $(RE_FILES_PATH)
 		$(OCAMLOPT) -output-obj \
-			-ccopt -fPIC -ccopt -pie -ccopt -llog -ccopt -landroid \
+			-ccopt -fPIC -ccopt -llog -ccopt -landroid \
 			bigarray.cmx \
 			-ccopt -lGLESv3 -ccopt -lEGL \
 			-o libfrom_ocaml.so \

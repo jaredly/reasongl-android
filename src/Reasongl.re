@@ -58,13 +58,14 @@ let module Gl
 
     let getContext = t => t;
     let init = (~title=?, ~argv: array(string), cb) => {
-      MLforJava.setMain((vc: Capi.window) => {
+      MLforJava.setMain((vc: float) => {
+        Capi.logAndroid("Hello from main" ++ string_of_float(vc));
           /* setPreferredFramesPerSecond(vc, 60); */
           /* let view = getView(vc); */
           /* setContext(view, context); */
           /* setDrawableDepthFormat(view, GLKViewDrawableDepthFormat24); */
           /* setCurrentContext(context); */
-          cb(vc)
+          /* cb(vc) */
       })
     };
   };
@@ -78,16 +79,16 @@ let module Gl
 
   /* let getTimeMs = () => 0.; */
   let render = (~window, ~mouseDown=?, ~mouseUp=?, ~mouseMove=?, ~keyDown=?, ~keyUp=?, ~windowResize=?, ~displayFunc, ()) => {
-    Callback.register("reasonglUpdate", (time) => displayFunc(time *. 1000.));
-    Callback.register("reasonglTouchDrag", switch mouseMove {
+    MLforJava.setUpdate((time) => displayFunc(time *. 1000.));
+    MLforJava.setTouchDrag(switch mouseMove {
     | None => (x, y) => ()
     | Some(fn) => (x, y) => ignore(fn(~x=int_of_float(x), ~y=int_of_float(y)))
     });
-    Callback.register("reasonglTouchPress", switch mouseDown {
+    MLforJava.setTouchPress(switch mouseDown {
     | None => (x, y) => ()
     | Some(fn) => (x, y) => ignore(fn(~button=Events.LeftButton, ~state=Events.MouseDown, ~x=int_of_float(x), ~y=int_of_float(y)))
     });
-    Callback.register("reasonglTouchRelease", switch mouseUp {
+    MLforJava.setTouchRelease(switch mouseUp {
     | None => (x, y) => ()
     | Some(fn) => (x, y) => ignore(fn(~button=Events.LeftButton, ~state=Events.MouseUp, ~x=int_of_float(x), ~y=int_of_float(y)))
     });

@@ -10,16 +10,18 @@
 
 #include <jni.h>
 
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "reasongl",__VA_ARGS__)
+
 #define JNI_METHOD(returnType, name) JNIEXPORT returnType JNICALL Java_com_example_hellolibs_OCamlBindings_ ## name
 
 #define CALL_OCAML_FN(name, arg) static value *ocaml_fn = NULL; \
   if (ocaml_fn == NULL) ocaml_fn = caml_named_value(name); \
-  if (ocaml_fn == NULL) __android_log_print(ANDROID_LOG_WARN, "reasongl", "Function not assigned %s", name); \
+  if (ocaml_fn == NULL) LOGI("Function not assigned %s", name); \
   else caml_callback(*ocaml_fn, arg);
 
 #define CALL_OCAML_FN2(name, arg1, arg2) static value *ocaml_fn = NULL; \
   if (ocaml_fn == NULL) ocaml_fn = caml_named_value(name); \
-  if (ocaml_fn == NULL) __android_log_print(ANDROID_LOG_WARN, "reasongl", "Function not assigned %s", name); \
+  if (ocaml_fn == NULL) LOGI("Function not assigned %s", name); \
   else caml_callback2(*ocaml_fn, arg1, arg2);
 
 
@@ -30,9 +32,10 @@
 JNI_METHOD(void, reasonglMain)(JNIEnv* env, jobject obj, jobject glView) {
   CAMLparam0();
   CAMLlocal1(ocamlWindow);
-  ocamlWindow = caml_alloc_small(2, 0);
-  Field(ocamlWindow, 0) = (long)env;
-  Field(ocamlWindow, 1) = (long)glView;
+  // ocamlWindow = caml_alloc_small(2, 0);
+  // Field(ocamlWindow, 0) = (long)env;
+  // Field(ocamlWindow, 1) = (long)glView;
+  ocamlWindow = caml_copy_double(1.0);
 
   /*
   jclass viewClass = (*env)->GetObjectClass(env, glView);
@@ -42,7 +45,9 @@ JNI_METHOD(void, reasonglMain)(JNIEnv* env, jobject obj, jobject glView) {
   __android_log_print(ANDROID_LOG_INFO, "reasongl", "OCAML Hight %d", height);
   */
 
+  LOGI("Before main");
   CALL_OCAML_FN("reasonglMain", ocamlWindow);
+  LOGI("After main");
   CAMLreturn0;
 }
 

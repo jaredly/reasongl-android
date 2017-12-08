@@ -26,7 +26,7 @@ mv CforJava.o build/src
 $OCAMLOPT -ccopt -std=c11 -c build/src/CforOCaml.c
 mv CforOCaml.o build/src
 
-$OCAMLOPT -output-obj -ccopt -fPIC -ccopt -pie -ccopt -llog -ccopt -landroid \
+$OCAMLOPT -output-obj -ccopt -fPIC -ccopt -llog -ccopt -landroid \
   -o libfrom_ocaml.so \
   build/src/Capi.cmx \
   build/src/CforOCaml.o build/src/CforJava.o \
