@@ -1,6 +1,7 @@
 package com.example.hellolibs;
 
 import android.app.Activity;
+import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -16,11 +17,13 @@ public class MainActivity extends Activity {
         OCamlBindings bindings = new OCamlBindings();
         long lastDrawTime = SystemClock.elapsedRealtimeNanos();
         GLSurfaceView view;
+        Context context;
 
-        public Renderer(GLSurfaceView view) {
+        public Renderer(GLSurfaceView view, Context context) {
             super();
 
             this.view = view;
+            this.context = context;
             view.setEGLContextClientVersion(2);
             view.setRenderer(this);
         }
@@ -37,7 +40,7 @@ public class MainActivity extends Activity {
         }
 
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            bindings.reasonglMain(view);
+            bindings.reasonglMain(view, new MyAssetManager(context.getAssets()));
         }
     }
 
@@ -45,7 +48,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         glView = new GLSurfaceView(this);
-        renderer = new Renderer(glView);
+        renderer = new Renderer(glView, this);
         setContentView(glView);
     }
 }

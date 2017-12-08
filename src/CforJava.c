@@ -29,13 +29,14 @@
 
 // passing objects around https://stackoverflow.com/questions/2504334/passing-data-types-from-java-to-c-or-vice-versa-using-jni
 
-JNI_METHOD(void, reasonglMain)(JNIEnv* env, jobject obj, jobject glView) {
+JNI_METHOD(void, reasonglMain)(JNIEnv* env, jobject obj, jobject glView, jobject myAssetManager) {
   CAMLparam0();
   CAMLlocal1(ocamlWindow);
-  ocamlWindow = caml_alloc_small(2, 0);
+  ocamlWindow = caml_alloc_small(3, 0);
+
   Field(ocamlWindow, 0) = (long)env;
   Field(ocamlWindow, 1) = (long)glView;
-  // ocamlWindow = caml_copy_double(1.0);
+  Field(ocamlWindow, 2) = (long)myAssetManager;
 
   /*
   jclass viewClass = (*env)->GetObjectClass(env, glView);
