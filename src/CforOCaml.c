@@ -5,6 +5,7 @@
 #include <caml/callback.h>
 #include <caml/printexc.h>
 #include <caml/threads.h>
+#include <caml/bigarray.h>
 
 #include <android/log.h>
 #include <android/asset_manager_jni.h>
@@ -54,9 +55,83 @@ CAMLprim value getWindowWidth(value ocamlWindow) {
   // CAMLreturn(Val_int(500));
 }
 
+#define Val_none Val_int(0)
 
-// CAMLprim loadImage(value window, value filename) {
-//   CAMLparam2(ocamlWindow, filename);
+static value Val_some(value v) {
+  CAMLparam1(v);
+  CAMLlocal1(some);
+  some = caml_alloc_small(1, 0);
+  Field(some, 0) = v;
+  CAMLreturn(some);
+}
+
+
+CAMLprim loadImage(value ocamlWindow, value filename) {
+  CAMLparam2(ocamlWindow, filename);
+  CAMLlocal2(record_image_data, dataArr);
+
+  JNIEnv* g_env = (JNIEnv*)(void *)Field(ocamlWindow, 0);
+  jobject g_pngmgr = (jobject)(void *)Field(ocamlWindow, 2);
+
+  jclass cls = (*g_env)->GetObjectClass(g_env, g_pngmgr);
+
+  /* Ask the PNG manager for a bitmap */
+  jmethodID openBitmap = (*g_env)->GetMethodID(g_env, cls, "openBitmap",
+                          "(Ljava/lang/String;)Landroid/graphics/Bitmap;");
+  jstring name = (*g_env)->NewStringUTF(g_env, String_val(filename));
+  jobject png = (*g_env)->CallObjectMethod(g_env, g_pngmgr, openBitmap, name);
+  (*g_env)->DeleteLocalRef(g_env, name);
+
+  if (!png) {
+    CAMLreturn(Val_none);
+  }
+
+  (*g_env)->NewGlobalRef(g_env, png);
+
+  /* Get image dimensions */
+  jmethodID getBitmapWidth = (*g_env)->GetMethodID(g_env, cls, "getBitmapWidth", "(Landroid/graphics/Bitmap;)I");
+  int width = (*g_env)->CallIntMethod(g_env, g_pngmgr, getBitmapWidth, png);
+  jmethodID getBitmapHeight = (*g_env)->GetMethodID(g_env, cls, "getBitmapHeight", "(Landroid/graphics/Bitmap;)I");
+  int height = (*g_env)->CallIntMethod(g_env, g_pngmgr, getBitmapHeight, png);
+
+  /* Get pixels */
+  jintArray array = (*g_env)->NewIntArray(g_env, width * height);
+  (*g_env)->NewGlobalRef(g_env, array);
+  jmethodID getBitmapPixels = (*g_env)->GetMethodID(g_env, cls, "getBitmapPixels", "(Landroid/graphics/Bitmap;[I)V");
+  (*g_env)->CallVoidMethod(g_env, g_pngmgr, getBitmapPixels, png, array);
+
+  jint *pixels = (*g_env)->GetIntArrayElements(g_env, array, 0);
+
+  uint channels = 4; // TODO get this from somewhere?
+
+
+
+  record_image_data = caml_alloc_small(4, 0);
+  Field(record_image_data, 0) = Val_int(width);
+  Field(record_image_data, 1) = Val_int(height);
+  Field(record_image_data, 2) = Val_int(channels);
+
+  // put the data in a bigarray
+  intnat *size = malloc(sizeof(intnat));
+  *size = width * height * channels;
+  dataArr = caml_ba_alloc(CAML_BA_UINT8, 1, pixels, size);
+  Field(record_image_data, 3) = dataArr;
+
+
+
+  (*g_env)->ReleaseIntArrayElements(g_env, array, pixels, 0);
+  (*g_env)->DeleteGlobalRef(g_env, array);
+
+  /* Free image */
+  jmethodID closeBitmap = (*g_env)->GetMethodID(g_env, cls, "closeBitmap", "(Landroid/graphics/Bitmap;)V");
+  (*g_env)->CallVoidMethod(g_env, g_pngmgr, closeBitmap, png);
+  (*g_env)->DeleteGlobalRef(g_env, png);
+
+
+
+  CAMLreturn(Val_some(record_image_data));
+}
+
 //   AAssetManager* assetManager = (AssetManager*)(void *)Field(ocamlWindow, 2);
 
 //   AAsset* asset = AAssetManager_open(assetManager, String_val(filename), AASSET_MODE_STREAMING);

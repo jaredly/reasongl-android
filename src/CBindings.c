@@ -54,7 +54,7 @@ CAMLprim value loadFile(value filename) {
   CAMLreturn(Val_none);
 }
 
-CAMLprim value loadImage(value filename) {
-  CAMLparam1(filename);
-  CAMLreturn(Val_none);
-}
+// CAMLprim value loadImage(value filename) {
+//   CAMLparam1(filename);
+//   CAMLreturn(Val_none);
+// }

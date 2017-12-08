@@ -172,8 +172,8 @@ let module Gl
   let getImageWidth = (image) => image.width;
   let getImageHeight = (image) => image.height;
 
-  let loadImage = (~filename: string, ~loadOption=?, ~callback: option(imageT) => unit, unit) => {
-    callback(Bindings.loadImage(~filename))
+  let loadImage = (~context: Capi.window, ~filename: string, ~loadOption=?, ~callback: option(imageT) => unit, unit) => {
+    callback(Bindings.loadImage(~context, ~filename))
   };
 
   let texImage2DWithImage = (~context, ~target, ~level, ~image) =>

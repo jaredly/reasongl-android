@@ -29,6 +29,6 @@ type _GLKViewT;
 /* [@noalloc] external setCurrentContext : contextT => unit = "setCurrentContext"; */
 
 
-external loadImage : (~filename: string) => option('a) = "loadImage";
+external loadImage : (~context: Capi.window, ~filename: string) => option('a) = "loadImage";
 external loadFile : (~filename: string) => option(string) = "loadFile";
 external getTimeMs : unit => float = "getTimeMs";

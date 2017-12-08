@@ -29,7 +29,7 @@ public class MyAssetManager {
         bmp.getPixels(pixels, 0, w, 0, 0, w, h);
     }
 
-    public void close(Bitmap bmp)
+    public void closeBitmap(Bitmap bmp)
     {
         bmp.recycle();
     }
