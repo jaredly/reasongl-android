@@ -133,7 +133,7 @@ CAMLprim value loadFile(value ocamlWindow, value filename) {
   }
 }
 
-void saveString(value ocamlWindow, value key, value data) {
+void saveData(value ocamlWindow, value key, value data) {
   CAMLparam3(ocamlWindow, key, data);
 
   JNIEnv* g_env = (JNIEnv*)(void *)Field(ocamlWindow, 0);
@@ -142,17 +142,20 @@ void saveString(value ocamlWindow, value key, value data) {
   jclass cls = (*g_env)->GetObjectClass(g_env, g_pngmgr);
 
   jmethodID method = (*g_env)->GetMethodID(g_env, cls, "saveUserData",
-                          "(Ljava/lang/String;Ljava/lang/String;)V");
+                          "(Ljava/lang/String;[B)V");
   jstring name = (*g_env)->NewStringUTF(g_env, String_val(key));
-  jstring contents = (*g_env)->NewStringUTF(g_env, String_val(data));
-  (*g_env)->CallObjectMethod(g_env, g_pngmgr, method, name, contents);
-  (*g_env)->DeleteLocalRef(g_env, name);
-  (*g_env)->DeleteLocalRef(g_env, contents);
 
+  int size = caml_string_length(data);
+  jbyteArray array = (*g_env)->NewByteArray(g_env, size);
+  (*g_env)->SetByteArrayRegion(g_env, array, 0, size, String_val(data));
+
+  (*g_env)->CallVoidMethod(g_env, g_pngmgr, method, name, array);
+  (*g_env)->DeleteLocalRef(g_env, name);
 }
 
-CAMLprim value loadString(value ocamlWindow, value key) {
+CAMLprim value loadData(value ocamlWindow, value key) {
   CAMLparam2(ocamlWindow, key);
+  CAMLlocal1(ml_data);
 
   JNIEnv* g_env = (JNIEnv*)(void *)Field(ocamlWindow, 0);
   jobject g_pngmgr = (jobject)(void *)Field(ocamlWindow, 2);
@@ -160,10 +163,23 @@ CAMLprim value loadString(value ocamlWindow, value key) {
   jclass cls = (*g_env)->GetObjectClass(g_env, g_pngmgr);
 
   jmethodID method = (*g_env)->GetMethodID(g_env, cls, "loadUserData",
-                          "(Ljava/lang/String;)Ljava/lang/String;");
+                          "(Ljava/lang/String;)[B");
+
   jstring name = (*g_env)->NewStringUTF(g_env, String_val(key));
-  jstring contents = (*g_env)->CallObjectMethod(g_env, g_pngmgr, method, name);
+  jbyteArray array = (*g_env)->CallObjectMethod(g_env, g_pngmgr, method, name);
   (*g_env)->DeleteLocalRef(g_env, name);
 
-  CAMLreturn(caml_copy_string(contents));
+  if (!array) {
+    CAMLreturn(Val_none);
+  } else {
+    int len = (*g_env)->GetArrayLength(g_env, array);
+    char buf[len];
+    (*g_env)->GetByteArrayRegion(g_env, array, 0, len, buf);
+
+    // from https://www.linux-nantes.org/~fmonnier/OCaml/ocaml-wrapping-c.html
+    ml_data = caml_alloc_string(len);
+    memcpy( String_val(ml_data), buf, len );
+
+    CAMLreturn(Val_some(ml_data));
+  }
 }

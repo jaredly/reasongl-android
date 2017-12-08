@@ -11,8 +11,8 @@ external getWindowWidth : window => int = "getWindowWidth";
 
 external texImage2DWithBitmap : (~context: window, ~target: int, ~level: int, ~bitmap: bitmap, ~border: int) => unit = "texImage2DWithBitmap";
 
-external saveString : (~context: window, ~key: string, ~value: string) => unit = "saveString";
-external loadString : (~context: window, ~key: string) => string = "loadString";
+external saveData : (~context: window, ~key: string, ~value: bytes) => unit = "saveData";
+external loadData : (~context: window, ~key: string) => option(bytes) = "loadData";
 
 external loadImage : (~context: window, ~filename: string) => option('a) = "loadImage";
 

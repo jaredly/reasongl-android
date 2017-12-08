@@ -5,6 +5,8 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLUtils;
+import android.util.Base64;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -49,13 +51,26 @@ public class MyAssetManager {
     public int getBitmapWidth(Bitmap bmp) { return bmp.getWidth(); }
     public int getBitmapHeight(Bitmap bmp) { return bmp.getHeight(); }
 
-    public String loadUserData(String key) {
-        return mSharedPreferences.getString(key, "");
+    public byte[] loadUserData(String key) {
+        String data = mSharedPreferences.getString(key, "");
+        Log.d("Got Data", data);
+        if (data.isEmpty()) {
+            return null;
+        } else {
+            try {
+                byte[] value = Base64.decode(data, Base64.DEFAULT);
+                return value;
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
-    public void saveUserData(String key, String value) {
+    public void saveUserData(String key, byte[] value) {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putString(key, value);
+        String data = Base64.encodeToString(value, Base64.DEFAULT);
+        Log.d("Saving Data", data);
+        editor.putString(key, data);
         editor.apply();
     }
 

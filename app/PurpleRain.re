@@ -41,7 +41,7 @@ type state = {
 
 let setup = (env) => {
   Env.size(~width=375, ~height=667, env);
-  Env.saveUserData(~key="awesome", ~value="Something", env);
+  let didSave: bool = Env.saveUserData(~key="awesome", ~value="Something", env);
   switch (Env.loadUserData(~key="awesome", env)) {
   | None => Capi.logAndroid("No data")
   | Some(x) => Capi.logAndroid("Some data: " ++ x)
