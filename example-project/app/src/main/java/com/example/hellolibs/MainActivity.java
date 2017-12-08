@@ -22,11 +22,9 @@ public class MainActivity extends Activity {
 
             this.view = view;
             view.setRenderer(this);
-            //https://stackoverflow.com/questions/8141209/android-setheight-of-glsurfaceview
         }
 
         public void onDrawFrame(GL10 gl) {
-            SystemClock.elapsedRealtime();
             long now = SystemClock.elapsedRealtimeNanos();
             long elapsed = now - lastDrawTime;
             bindings.reasonglUpdate(elapsed / 1000.0);

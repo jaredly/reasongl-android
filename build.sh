@@ -1,8 +1,5 @@
 
-DEST=example-project/app/src/main/jniLibs/armeabi-v7a
-
 SYSROOT=~/.opam/4.04.0-android32/android-sysroot
-NDK_BIN=~/.opam/4.04.0-android32/android-ndk/toolchains/arm-linux-androideabi-4.9/prebuilt/darwin-x86_64/arm-linux-androideabi/bin
 
 opam switch 4.04.0-android32
 eval `opam config env`
@@ -21,7 +18,7 @@ REFMT=~/.opam/4.04.2/bin/refmt
 
 # Compile to a .o
 $OCAMLOPT -c -o build/stub/Capi.cmx -pp "$REFMT --print binary" -impl build/stub/Capi.re
-$OCAMLOPT -c -o build/src/App.cmx build/src/App.ml
+$OCAMLOPT -c -o build/src/App.cmx -pp "$REFMT --print binary" -impl build/src/App.re
 $OCAMLOPT -c -o build/stub/MLforJava.cmx -pp "$REFMT --print binary" -impl build/stub/MLforJava.re
 
 $OCAMLOPT -ccopt -std=c11 -c build/stub/CforJava.c
@@ -29,7 +26,7 @@ mv CforJava.o build/stub
 $OCAMLOPT -ccopt -std=c11 -c build/stub/CforOCaml.c
 mv CforOCaml.o build/stub
 
-$OCAMLOPT -output-obj -ccopt -llog -ccopt -landroid \
+$OCAMLOPT -output-obj -ccopt -fPIC -ccopt -pie -ccopt -llog -ccopt -landroid \
   -o libfrom_ocaml.so \
   build/stub/Capi.cmx \
   build/src/App.cmx \
@@ -38,6 +35,6 @@ $OCAMLOPT -output-obj -ccopt -llog -ccopt -landroid \
   $SYSROOT/lib/ocaml/libasmrun.a
 
 # Move into our android project
+DEST=example-project/app/src/main/jniLibs/armeabi-v7a
 mkdir -p $DEST
-cp libfrom_ocaml.so $DEST/libreasongl.so
-
+mv libfrom_ocaml.so $DEST/libreasongl.so
