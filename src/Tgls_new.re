@@ -41,7 +41,7 @@ external genBuffers : int => array(bufferT) = "TglGenBuffers";
 [@noalloc] external genBuffer : unit => bufferT = "TglGenBuffer";
 
 [@noalloc]
-external clearColor : (~red: float, ~green: float, ~blue: float, ~alpha: float) => unit =
+external clearColor : (~r: float, ~g: float, ~b: float, ~a: float) => unit =
   "TglClearColor";
 
 type textureT;
@@ -582,7 +582,7 @@ let gl_float = 5126;
 let gl_double = 5130;
 
 external vertexAttribPointer :
-  (~index: attribT, ~size: int, ~typ: int, ~normalize: bool, ~stride: int, ~offset: int) => unit =
+  (~attribute: attribT, ~size: int, ~type_: int, ~normalize: bool, ~stride: int, ~offset: int) => unit =
   "TglVertexAttribPointer_bytecode" "TglVertexAttribPointer_native";
 
 external vertexAttribDivisor : (~attribute: attribT, ~divisor: int) => unit =
@@ -644,7 +644,7 @@ let gl_polygon = 9;
 
 [@noalloc] external drawArrays : (~mode: int, ~first: int, ~count: int) => unit = "TglDrawArrays";
 
-[@noalloc] external drawElements : (~mode: int, ~count: int, ~typ: int, ~offset: int) => unit =
+[@noalloc] external drawElements : (~mode: int, ~count: int, ~type_: int, ~offset: int) => unit =
   "TglDrawElements";
 
 [@noalloc]

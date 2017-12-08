@@ -3,8 +3,10 @@ let module Gl
 : RGLInterface.t
  = {
   include Bindings;
-  include Tgls_new;
+  /* include Tgls_new; */
   type contextT = Capi.window;
+  type programT = Tgls_new.programT;
+  type attributeT = Tgls_new.attribT;
 
   let target = "native-android";
   module type FileT = {type t; let readFile: (~filename: string, ~cb: string => unit) => unit;
@@ -99,31 +101,27 @@ let module Gl
     | Program_delete_status
     | Link_status
     | Validate_status;
-  let _getProgramParameter = (~context, ~program: programT, ~paramName) =>
-    getProgramiv(~context, ~program, ~pname=paramName);
   let getProgramParameter = (~context, ~program: programT, ~paramName) =>
     switch paramName {
     | Program_delete_status =>
-      _getProgramParameter(~context, ~program, ~paramName=GLConstants.gl_delete_status)
-    | Link_status => _getProgramParameter(~context, ~program, ~paramName=GLConstants.gl_link_status)
-    | Validate_status => _getProgramParameter(~context, ~program, ~paramName=GLConstants.gl_validate_status)
+      Tgls_new.getProgramiv(~program, ~pname=GLConstants.gl_delete_status)
+    | Link_status => Tgls_new.getProgramiv(~program, ~pname=GLConstants.gl_link_status)
+    | Validate_status => Tgls_new.getProgramiv(~program, ~pname=GLConstants.gl_validate_status)
     };
-  let _getShaderParameter = (~context, ~shader, ~paramName) =>
-    getShaderiv(~context, ~shader, ~pname=paramName);
   let getShaderParameter = (~context, ~shader, ~paramName) =>
     switch paramName {
     | Shader_delete_status =>
-      _getShaderParameter(~context, ~shader, ~paramName=GLConstants.gl_delete_status)
-    | Compile_status => _getShaderParameter(~context, ~shader, ~paramName=GLConstants.gl_compile_status)
-    | Shader_type => _getShaderParameter(~context, ~shader, ~paramName=GLConstants.gl_shader_type)
+      Tgls_new.getShaderiv(~shader, ~pname=GLConstants.gl_delete_status)
+    | Compile_status => Tgls_new.getShaderiv(~shader, ~pname=GLConstants.gl_compile_status)
+    | Shader_type => Tgls_new.getShaderiv(~shader, ~pname=GLConstants.gl_shader_type)
 };
   let shaderSource = (~context, ~shader, ~source) => {
-    Tgls.shaderSource(~context, ~shader, ~source=[|source|])
+    Tgls_new.shaderSource(shader, [|source|])
   };
 
   let readPixels_RGBA = (~context as _, ~x, ~y, ~width, ~height) =>
-    Tgls.readPixels_RGBA(~x, ~y, ~width, ~height);
-  let createTexture = (~context: contextT) => Tgls.genTexture(~context);
+    Tgls_new.readPixels_RGBA(~x, ~y, ~width, ~height);
+  let createTexture = (~context: contextT) => Tgls_new.genTexture();
 
   let texImage2D_RGBA =
     (
@@ -135,7 +133,7 @@ let module Gl
       ~border: int,
       ~data: Bigarray.Array1.t('a, 'b, Bigarray.c_layout)
     ) =>
-    Tgls.texImage2D_RGBA(~target, ~level, ~width, ~height, ~border, ~data);
+    Tgls_new.texImage2D_RGBA(~target, ~level, ~width, ~height, ~border, ~data);
 
   let drawElementsInstanced = (~context: contextT, ~mode: int, ~count: int, ~type_: int, ~indices: int, ~primcount: int) =>
     failwith("We're using opengles 2, which doesn't support drawElementsInstanced");
@@ -490,7 +488,47 @@ let module Gl
   };
 
   let uniformMatrix4fv = (~context, ~location, ~value: Mat4.t) =>
-  Tgls.uniformMatrix4fv(~context, ~location, ~transpose=false, ~value=Mat4.to_array(value));
+  Tgls_new.uniformMatrix4fv(~location, ~transpose=false, ~value=Mat4.to_array(value));
+
+  let drawElements = (~context) => Tgls_new.drawElements;
+  let drawArrays = (~context) => Tgls_new.drawArrays;
+  let getShaderSource = (~context) => Tgls_new.getShaderSource;
+  let getProgramInfoLog = (~context) => Tgls_new.getProgramInfoLog;
+  let getShaderInfoLog = (~context) => Tgls_new.getShaderInfoLog;
+  let vertexAttribPointer = (~context) => Tgls_new.vertexAttribPointer;
+  let enableVertexAttribArray = (~context, ~attribute) => Tgls_new.enableVertexAttribArray(attribute);
+  let getAttribLocation = (~context) => Tgls_new.getAttribLocation;
+  let getUniformLocation = (~context) => Tgls_new.getUniformLocation;
+  let clear = (~context, ~mask) => Tgls_new.clear(mask);
+  let viewport = (~context) => Tgls_new.viewport;
+  let bufferData = (~context) => Tgls_new.bufferData;
+  let uniform4f = (~context) => Tgls_new.uniform4f;
+  let uniform3f = (~context) => Tgls_new.uniform3f;
+  let uniform2f = (~context) => Tgls_new.uniform2f;
+  let uniform1f = (~context) => Tgls_new.uniform1f;
+  let uniform1i = (~context) => Tgls_new.uniform1i;
+  let texSubImage2D = (~context) => Tgls_new.texSubImage2D;
+  let blendFunc = (~context, sfactor, dfactor) => Tgls_new.blendFunc(~sfactor, ~dfactor);
+  let disable = (~context) => Tgls_new.disable;
+  let enable = (~context) => Tgls_new.enable;
+  let texParameteri = (~context) => Tgls_new.texParameteri;
+  let bindTexture = (~context) => Tgls_new.bindTexture;
+  let activeTexture = (~context) => Tgls_new.activeTexture;
+  /* '<,'>s/(\w+)'.*$/$1 = (~context) => Tgls_new.$1;/g */
+  type textureT = Tgls_new.textureT;
+  type uniformT = Tgls_new.uniformT;
+  type bufferT = Tgls_new.bufferT;
+  type shaderT = Tgls_new.shaderT;
+  let bindBuffer = (~context) => Tgls_new.bindBuffer;
+  let createBuffer = (~context) => Tgls_new.genBuffer();
+  let useProgram = (~context) => Tgls_new.useProgram;
+  let linkProgram = (~context) => Tgls_new.linkProgram;
+  let compileShader = (~context) => Tgls_new.compileShader;
+  let deleteShader = (~context) => Tgls_new.deleteShader;
+  let attachShader = (~context) => Tgls_new.attachShader;
+  let createShader = (~context) => Tgls_new.createShader;
+  let createProgram = (~context) => Tgls_new.createProgram();
+  let clearColor = (~context) => Tgls_new.clearColor;
 
 };
 

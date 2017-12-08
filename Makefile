@@ -58,6 +58,7 @@ TestReason: matchenv.ppx Build $(C_FILES_PATH) $(RE_FILES_PATH)
 		$(OCAMLOPT) -output-obj \
 			-ccopt -fPIC -ccopt -pie -ccopt -llog -ccopt -landroid \
 			bigarray.cmx \
+			-ccopt -lGLESv3 -ccopt -lEGL \
 			-o libfrom_ocaml.so \
 			$(RE_FILES_PATH) $(C_FILES_PATH) $(OCAMLDIR)/lib/ocaml/libasmrun.a
 		# $(OCAMLOPT) bigarray.cmxa $(C_FILES_PATH) $(RE_FILES_PATH) -output-obj -o Build/re_output.o
