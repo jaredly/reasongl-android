@@ -21,6 +21,7 @@ public class MainActivity extends Activity {
             super();
 
             this.view = view;
+            view.setEGLContextClientVersion(2);
             view.setRenderer(this);
         }
 

@@ -37,6 +37,7 @@ JNI_METHOD(void, reasonglMain)(JNIEnv* env, jobject obj, jobject glView) {
   // Field(ocamlWindow, 1) = (long)glView;
   ocamlWindow = caml_copy_double(1.0);
 
+  // setEGLContextClientVersion(2);
   /*
   jclass viewClass = (*env)->GetObjectClass(env, glView);
   jmethodID getHeight = (*env)->GetMethodID(env, viewClass, "getHeight", "()I");

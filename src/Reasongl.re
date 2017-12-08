@@ -59,13 +59,22 @@ let module Gl
     let getContext = t => t;
     let init = (~title=?, ~argv: array(string), cb) => {
       MLforJava.setMain((vc: float) => {
-        Capi.logAndroid("Hello from main" ++ string_of_float(vc));
+        /* Capi.logAndroid("Hello from main" ++ string_of_float(vc)); */
           /* setPreferredFramesPerSecond(vc, 60); */
           /* let view = getView(vc); */
           /* setContext(view, context); */
           /* setDrawableDepthFormat(view, GLKViewDrawableDepthFormat24); */
           /* setCurrentContext(context); */
-          /* cb(vc) */
+        try {
+          cb(Obj.magic(vc))
+        } {
+          | Failure(text) => {
+            Capi.logAndroid("Dying with failure: " ++ text)
+          }
+          | err => {
+            Capi.logAndroid("Dying with unknown exception")
+          }
+        }
       })
     };
   };
