@@ -15,6 +15,8 @@
 
 #include <jni.h>
 
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "reasongl",__VA_ARGS__)
+
 // Init the runtime
 __attribute__ ((__constructor__))
 void reasongl_init(void) {
@@ -94,17 +96,18 @@ CAMLprim loadImage(value ocamlWindow, value filename) {
   jmethodID getBitmapHeight = (*g_env)->GetMethodID(g_env, cls, "getBitmapHeight", "(Landroid/graphics/Bitmap;)I");
   int height = (*g_env)->CallIntMethod(g_env, g_pngmgr, getBitmapHeight, png);
 
-  /* Get pixels */
-  jintArray array = (*g_env)->NewIntArray(g_env, width * height);
-  (*g_env)->NewLocalRef(g_env, array);
-  jmethodID getBitmapPixels = (*g_env)->GetMethodID(g_env, cls, "getBitmapPixels", "(Landroid/graphics/Bitmap;[I)V");
-  (*g_env)->CallVoidMethod(g_env, g_pngmgr, getBitmapPixels, png, array);
-
-  jint *pixels = (*g_env)->GetIntArrayElements(g_env, array, 0);
-
   uint channels = 4; // TODO get this from somewhere?
 
+  /* Get pixels */
+  jbyteArray array = (*g_env)->NewByteArray(g_env, width * height * channels);
+  (*g_env)->NewLocalRef(g_env, array);
+  jmethodID getBitmapPixels = (*g_env)->GetMethodID(g_env, cls, "getBitmapPixels", "(Landroid/graphics/Bitmap;[B)V");
+  (*g_env)->CallVoidMethod(g_env, g_pngmgr, getBitmapPixels, png, array);
 
+  jbyte *pixels = (*g_env)->GetByteArrayElements(g_env, array, 0);
+
+
+  LOGI("Data[0] %d %d %d %d", pixels[0], pixels[1], pixels[2], pixels[3]);
 
   record_image_data = caml_alloc_small(4, 0);
   Field(record_image_data, 0) = Val_int(width);
@@ -119,7 +122,7 @@ CAMLprim loadImage(value ocamlWindow, value filename) {
 
 
 
-  (*g_env)->ReleaseIntArrayElements(g_env, array, pixels, 0);
+  (*g_env)->ReleaseByteArrayElements(g_env, array, pixels, 0);
   (*g_env)->DeleteLocalRef(g_env, array);
 
   /* Free image */

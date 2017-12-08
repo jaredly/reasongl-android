@@ -173,7 +173,18 @@ let module Gl
   let getImageHeight = (image) => image.height;
 
   let loadImage = (~context: Capi.window, ~filename: string, ~loadOption=?, ~callback: option(imageT) => unit, unit) => {
-    callback(Bindings.loadImage(~context, ~filename))
+    let i = Bindings.loadImage(~context, ~filename);
+    switch (i) {
+    | Some(i) => {
+      Capi.logAndroid("Top: " ++ string_of_int(Bigarray.Array1.get(i.data, 0)));
+      Capi.logAndroid("Top: " ++ string_of_int(Bigarray.Array1.get(i.data, 1)));
+      Capi.logAndroid("Top: " ++ string_of_int(Bigarray.Array1.get(i.data, 2)));
+      Capi.logAndroid("Top: " ++ string_of_int(Bigarray.Array1.get(i.data, 3)));
+      Capi.logAndroid("Top: " ++ string_of_int(Bigarray.Array1.get(i.data, 4)));
+    }
+    | _ => ()
+    };
+    callback(i)
   };
 
   let texImage2DWithImage = (~context, ~target, ~level, ~image) =>
