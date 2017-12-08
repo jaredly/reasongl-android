@@ -9,20 +9,20 @@ let module Gl
   type attributeT = Tgls_new.attribT;
 
   let target = "native-android";
-  module type FileT = {type t; let readFile: (~filename: string, ~cb: string => unit) => unit;
-    let saveUserData: (~key: string, ~value: 'a) => bool;
-    let loadUserData: (~key: string) => option('a);
+  module type FileT = {type t; let readFile: (~context: contextT, ~filename: string, ~cb: string => unit) => unit;
+    let saveUserData: (~context: contextT, ~key: string, ~value: 'a) => bool;
+    let loadUserData: (~context: contextT, ~key: string) => option('a);
   };
   module File: FileT = {
     type t;
-    let readFile = (~filename, ~cb) => {
-      switch (loadFile(filename)) {
+    let readFile = (~context, ~filename, ~cb) => {
+      switch (Capi.loadFile(~context, ~filename)) {
       | None => failwith("File not found in resources: " ++ filename)
       | Some(text) => cb(text)
       }
     };
-    let loadUserData = (~key) => None;
-    let saveUserData = (~key, ~value) => false;
+    let loadUserData = (~context, ~key) => None;
+    let saveUserData = (~context, ~key, ~value) => false;
   };
 
   module type WindowT = {
@@ -86,6 +86,7 @@ let module Gl
   };
 
   /* let getTimeMs = () => 0.; */
+  let getTimeMs = Capi.getTimeMs;
   let render = (~window, ~mouseDown=?, ~mouseUp=?, ~mouseMove=?, ~keyDown=?, ~keyUp=?, ~windowResize=?, ~displayFunc, ()) => {
     MLforJava.setUpdate((time) => {
       try {displayFunc(time *. 1000.)} {
@@ -172,7 +173,7 @@ let module Gl
   let getImageHeight = (image) => image.height;
 
   let loadImage = (~context: Capi.window, ~filename: string, ~loadOption=?, ~callback: option(imageT) => unit, unit) => {
-    callback(Bindings.loadImage(~context, ~filename))
+    callback(Capi.loadImage(~context, ~filename))
   };
 
   let texImage2DWithImage = (~context, ~target, ~level, ~image) => {

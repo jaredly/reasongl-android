@@ -111,3 +111,59 @@ CAMLprim value loadImage(value ocamlWindow, value filename) {
     CAMLreturn(Val_some(record_image_data));
   }
 }
+
+CAMLprim value loadFile(value ocamlWindow, value filename) {
+  CAMLparam2(ocamlWindow, filename);
+
+  JNIEnv* g_env = (JNIEnv*)(void *)Field(ocamlWindow, 0);
+  jobject g_pngmgr = (jobject)(void *)Field(ocamlWindow, 2);
+
+  jclass cls = (*g_env)->GetObjectClass(g_env, g_pngmgr);
+
+  jmethodID method = (*g_env)->GetMethodID(g_env, cls, "readFileContents",
+                          "(Ljava/lang/String;)Ljava/lang/String;");
+  jstring name = (*g_env)->NewStringUTF(g_env, String_val(filename));
+  jstring contents = (*g_env)->CallObjectMethod(g_env, g_pngmgr, method, name);
+  (*g_env)->DeleteLocalRef(g_env, name);
+
+  if (contents) {
+    CAMLreturn(Val_some(caml_copy_string(contents)));
+  } else {
+    CAMLreturn(Val_none);
+  }
+}
+
+void saveString(value ocamlWindow, value key, value data) {
+  CAMLparam3(ocamlWindow, key, data);
+
+  JNIEnv* g_env = (JNIEnv*)(void *)Field(ocamlWindow, 0);
+  jobject g_pngmgr = (jobject)(void *)Field(ocamlWindow, 2);
+
+  jclass cls = (*g_env)->GetObjectClass(g_env, g_pngmgr);
+
+  jmethodID method = (*g_env)->GetMethodID(g_env, cls, "saveUserData",
+                          "(Ljava/lang/String;Ljava/lang/String;)V");
+  jstring name = (*g_env)->NewStringUTF(g_env, String_val(key));
+  jstring contents = (*g_env)->NewStringUTF(g_env, String_val(data));
+  (*g_env)->CallObjectMethod(g_env, g_pngmgr, method, name, contents);
+  (*g_env)->DeleteLocalRef(g_env, name);
+  (*g_env)->DeleteLocalRef(g_env, contents);
+
+}
+
+CAMLprim value loadString(value ocamlWindow, value key) {
+  CAMLparam2(ocamlWindow, key);
+
+  JNIEnv* g_env = (JNIEnv*)(void *)Field(ocamlWindow, 0);
+  jobject g_pngmgr = (jobject)(void *)Field(ocamlWindow, 2);
+
+  jclass cls = (*g_env)->GetObjectClass(g_env, g_pngmgr);
+
+  jmethodID method = (*g_env)->GetMethodID(g_env, cls, "loadUserData",
+                          "(Ljava/lang/String;)Ljava/lang/String;");
+  jstring name = (*g_env)->NewStringUTF(g_env, String_val(key));
+  jstring contents = (*g_env)->CallObjectMethod(g_env, g_pngmgr, method, name);
+  (*g_env)->DeleteLocalRef(g_env, name);
+
+  CAMLreturn(caml_copy_string(contents));
+}

@@ -40,7 +40,7 @@ public class MainActivity extends Activity {
         }
 
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            bindings.reasonglMain(view, new MyAssetManager(context.getAssets()));
+            bindings.reasonglMain(view, new MyAssetManager(context.getAssets(), context.getSharedPreferences("reasongl", MODE_PRIVATE)));
         }
     }
 

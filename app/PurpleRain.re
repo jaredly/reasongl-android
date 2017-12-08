@@ -41,6 +41,11 @@ type state = {
 
 let setup = (env) => {
   Env.size(~width=375, ~height=667, env);
+  Env.saveUserData(~key="awesome", ~value="Something", env);
+  switch (Env.loadUserData(~key="awesome", env)) {
+  | None => Capi.logAndroid("No data")
+  | Some(x) => Capi.logAndroid("Some data: " ++ x)
+  };
   let lst = Array.init(50, (_) => make(Env.width(env), ((-500), (-50)), 0));
   {
     lst, time: 0, running: true,
