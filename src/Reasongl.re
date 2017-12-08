@@ -58,8 +58,7 @@ let module Gl
 
     let getContext = t => t;
     let init = (~title=?, ~argv: array(string), cb) => {
-      MLforJava.setMain((vc: float) => {
-        /* Capi.logAndroid("Hello from main" ++ string_of_float(vc)); */
+      MLforJava.setMain((vc: Capi.window) => {
           /* setPreferredFramesPerSecond(vc, 60); */
           /* let view = getView(vc); */
           /* setContext(view, context); */
@@ -88,7 +87,16 @@ let module Gl
 
   /* let getTimeMs = () => 0.; */
   let render = (~window, ~mouseDown=?, ~mouseUp=?, ~mouseMove=?, ~keyDown=?, ~keyUp=?, ~windowResize=?, ~displayFunc, ()) => {
-    MLforJava.setUpdate((time) => displayFunc(time *. 1000.));
+    MLforJava.setUpdate((time) => {
+      try {displayFunc(time *. 1000.)} {
+      | Failure(text) => {
+        Capi.logAndroid("Dying in update with failure " ++ text)
+      }
+      | _ => {
+        Capi.logAndroid("Dying for unknown reaslong")
+      }
+      }
+    });
     MLforJava.setTouchDrag(switch mouseMove {
     | None => (x, y) => ()
     | Some(fn) => (x, y) => ignore(fn(~x=int_of_float(x), ~y=int_of_float(y)))
