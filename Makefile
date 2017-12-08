@@ -31,7 +31,7 @@ REASONGL_FILES = Capi MLforJava GLConstants Bindings Tgls_new Reasongl
 REFMT=~/.opam/4.04.2/bin/refmt
 
 # The test app
-APP_PATHS = app/PurpleRain.re
+APP_PATHS = app/FlappyBird.re
 APP_FILES = $(basename $(notdir $(APP_PATHS)))
 
 C_FILES_PATH=$(addprefix Build/src/, $(addsuffix .o, $(C_FILES)))

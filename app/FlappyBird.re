@@ -173,6 +173,7 @@ let draw = ({font, score, image, birdY, birdVY, pipes, xOffset, running} as stat
   let userInput =
     switch Reasongl.Gl.target {
     | "native-ios" => Env.mousePressed(env)
+    | "native-android" => Env.mousePressed(env)
     | _ => Env.keyPressed(Space, env)
     };
   drawTiledThing(

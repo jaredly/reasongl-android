@@ -107,7 +107,7 @@ let module Gl
   let getTimeMs = Capi.getTimeMs;
   let render = (~window, ~mouseDown=?, ~mouseUp=?, ~mouseMove=?, ~keyDown=?, ~keyUp=?, ~windowResize=?, ~displayFunc, ()) => {
     MLforJava.setUpdate((time) => {
-      try {displayFunc(time *. 1000.)} {
+      try {displayFunc(time /. 1000.0)} {
       | Failure(text) => {
         Capi.logAndroid("Dying in update with failure " ++ text)
       }
@@ -122,7 +122,10 @@ let module Gl
     });
     MLforJava.setTouchPress(switch mouseDown {
     | None => (x, y) => ()
-    | Some(fn) => (x, y) => ignore(fn(~button=Events.LeftButton, ~state=Events.MouseDown, ~x=int_of_float(x), ~y=int_of_float(y)))
+    | Some(fn) => (x, y) => {
+      /* Capi.logAndroid("TOUCH"); */
+      ignore(fn(~button=Events.LeftButton, ~state=Events.MouseDown, ~x=int_of_float(x), ~y=int_of_float(y)))
+    }
     });
     MLforJava.setTouchRelease(switch mouseUp {
     | None => (x, y) => ()
