@@ -39,8 +39,8 @@ let module Gl
 
   module Window: WindowT = {
     type t = Capi.window;
-    let getWidth = (window) => 375; /** TODO make general */
-    let getHeight = (window) => 667;
+    let getWidth = (window) => Capi.getWindowWidth(window);
+    let getHeight = (window) => Capi.getWindowHeight(window);
     /** TODO these are probably wrong */
     let getPixelWidth = (window) => getWidth(window);
     let getPixelHeight = (window) => getHeight(window);

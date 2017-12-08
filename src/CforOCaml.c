@@ -28,27 +28,27 @@ void logAndroid(value text) {
 
 CAMLprim value getWindowHeight(value ocamlWindow) {
   CAMLparam1(ocamlWindow);
-  // JNIEnv* env = (JNIEnv*)(void *)Field(ocamlWindow, 0);
-  // jobject glView = (jobject)(void *)Field(ocamlWindow, 1);
+  JNIEnv* env = (JNIEnv*)(void *)Field(ocamlWindow, 0);
+  jobject glView = (jobject)(void *)Field(ocamlWindow, 1);
 
-  // jclass viewClass = (*env)->GetObjectClass(env, glView);
-  // jmethodID getHeight = (*env)->GetMethodID(env, viewClass, "getHeight", "()I");
-  // int height =  (*env)->CallIntMethod(env, glView, getHeight);
+  jclass viewClass = (*env)->GetObjectClass(env, glView);
+  jmethodID getHeight = (*env)->GetMethodID(env, viewClass, "getHeight", "()I");
+  int height =  (*env)->CallIntMethod(env, glView, getHeight);
 
-  // CAMLreturn(Val_int(height));
-  CAMLreturn(Val_int(1000));
+  CAMLreturn(Val_int(height));
+  // CAMLreturn(Val_int(1000));
 }
 
 CAMLprim value getWindowWidth(value ocamlWindow) {
   CAMLparam1(ocamlWindow);
-  // JNIEnv* env = (JNIEnv*)(void *)Field(ocamlWindow, 0);
-  // jobject glView = (jobject)(void *)Field(ocamlWindow, 1);
+  JNIEnv* env = (JNIEnv*)(void *)Field(ocamlWindow, 0);
+  jobject glView = (jobject)(void *)Field(ocamlWindow, 1);
 
-  // jclass viewClass = (*env)->GetObjectClass(env, glView);
-  // jmethodID getHeight = (*env)->GetMethodID(env, viewClass, "getWidth", "()I");
-  // int height =  (*env)->CallIntMethod(env, glView, getHeight);
+  jclass viewClass = (*env)->GetObjectClass(env, glView);
+  jmethodID getHeight = (*env)->GetMethodID(env, viewClass, "getWidth", "()I");
+  int height =  (*env)->CallIntMethod(env, glView, getHeight);
 
-  // CAMLreturn(Val_int(height));
-  CAMLreturn(Val_int(500));
+  CAMLreturn(Val_int(height));
+  // CAMLreturn(Val_int(500));
 }
 
