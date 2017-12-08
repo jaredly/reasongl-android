@@ -54,6 +54,8 @@ reason-watch:
 	# Brew install watchexec if you don't have it https://github.com/mattgreen/watchexec
 	watchexec -w src $(MAKE) TestReason
 
+DEST=example-project/app/src/main/jniLibs/armeabi-v7a
+
 TestReason: matchenv.ppx Build $(C_FILES_PATH) $(RE_FILES_PATH)
 		$(OCAMLOPT) -output-obj \
 			-ccopt -fPIC -ccopt -pie -ccopt -llog -ccopt -landroid \
@@ -61,6 +63,8 @@ TestReason: matchenv.ppx Build $(C_FILES_PATH) $(RE_FILES_PATH)
 			-ccopt -lGLESv3 -ccopt -lEGL \
 			-o libfrom_ocaml.so \
 			$(RE_FILES_PATH) $(C_FILES_PATH) $(OCAMLDIR)/lib/ocaml/libasmrun.a
+		mkdir -p $(DEST)
+		mv libfrom_ocaml.so $(DEST)/libreasongl.so
 		# $(OCAMLOPT) bigarray.cmxa $(C_FILES_PATH) $(RE_FILES_PATH) -output-obj -o Build/re_output.o
 		# cp $(OCAMLDIR)/lib/ocaml/libasmrun.a Build/libGobi.a
 		# ar -r Build/libGobi.a $(C_FILES_PATH) Build/re_output.o

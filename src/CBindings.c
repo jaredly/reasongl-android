@@ -43,3 +43,18 @@ static value Val_some(value v) {
   Field(some, 0) = v;
   CAMLreturn(some);
 }
+
+CAMLprim value getTimeMs() {
+  CAMLparam0();
+  CAMLreturn(caml_copy_double(gettimeofday()));
+}
+
+CAMLprim value loadFile(value filename) {
+  CAMLparam1(filename);
+  CAMLreturn(Val_none);
+}
+
+CAMLprim value loadImage(value filename) {
+  CAMLparam1(filename);
+  CAMLreturn(Val_none);
+}

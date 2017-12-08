@@ -38,3 +38,5 @@ $OCAMLOPT -output-obj -ccopt -fPIC -ccopt -pie -ccopt -llog -ccopt -landroid \
 DEST=example-project/app/src/main/jniLibs/armeabi-v7a
 mkdir -p $DEST
 mv libfrom_ocaml.so $DEST/libreasongl.so
+
+Java_com_example_hellolibs_OCamlBindings_reasonglMain
