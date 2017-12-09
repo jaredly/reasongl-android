@@ -16,10 +16,6 @@ OCAMLOPT=BSB_BACKEND=native-android $(OCAMLBIN) -g -ccopt -fno-omit-frame-pointe
 	-ppx ./matchenv.ppx \
 	-runtime-variant _pic
 
-# CFLAGS = -isysroot $(PLT)$(SDK) -isystem $(OCAMLDIR)/lib/ocaml -DCAML_NAME_SPACE -I$(CURDIR)/OCamlTest/OCamlTest -I$(OCAMLDIR)/lib/ocaml/caml -I$(OCAMLDIR)/lib/ocaml -I$(OCAMLDIR)/../stdlib/ -fno-objc-arc -miphoneos-version-min=$(IOSMINREV)
-# OCAMLOPT = BSB_BACKEND=$(BSB_BACKEND) $(OCAMLBIN)/bin/ocamlopt -pp 'refmt --print binary' -ppx ./matchenv.ppx -I $(CURDIR) -no-alias-deps -ccopt -isysroot -ccopt $(PLT)$(SDK)
-# MLFLAGS = -c -I Build/src -I Build/app -I Build/reasongl-interface/src -I Build/reprocessing/src -I $(OCAMLDIR)/lib/ocaml bigarray.cmxa
-
 # Libraries
 REASONGL_INTERFACE_FILES = RGLConstants RGLEvents RGLInterface ReasonglInterface
 REPROCESSING_FILES = Reprocessing_Events Reprocessing_Common Reprocessing_Constants Reprocessing_Matrix Reprocessing_Shaders Reprocessing_Internal Reprocessing_Font Reprocessing_Types Reprocessing_Utils Reprocessing_Hotreload Reprocessing_Env Reprocessing_Draw Reprocessing_ClientWrapper Reprocessing
@@ -69,9 +65,6 @@ TestReason: matchenv.ppx Build $(C_FILES_PATH) $(RE_FILES_PATH)
 			$(RE_FILES_PATH) $(C_FILES_PATH) $(OCAMLDIR)/lib/ocaml/libasmrun.a
 		mkdir -p $(DEST)
 		mv libfrom_ocaml.so $(DEST)/libreasongl.so
-		# $(OCAMLOPT) bigarray.cmxa $(C_FILES_PATH) $(RE_FILES_PATH) -output-obj -o Build/re_output.o
-		# cp $(OCAMLDIR)/lib/ocaml/libasmrun.a Build/libGobi.a
-		# ar -r Build/libGobi.a $(C_FILES_PATH) Build/re_output.o
 
 Build:
 	mkdir -p Build/src Build/app Build/reasongl-interface/src Build/reprocessing/src
@@ -91,7 +84,6 @@ Build/%.cmx: %.re
 
 depend::
 		$(OCAMLBIN)/bin/ocamldep -pp '$(REFMT) --print binary' -ml-synonym .re  -I src -I app src/*.re app/*.re > MLDepend
-		# $(CC) $(CFLAGS) $(MFLAGS) -MM *.m > MDepend
 
 -include MLDepend
 -include MDepend
