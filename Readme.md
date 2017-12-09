@@ -6,6 +6,5 @@
 
 # Building
 
-- run `./build.sh`
-- then go into `example-project` and run `./gradlew installDebug` (assuming you have an emulator running or your phone plugged in)
+- run `make install` (assuming you have an emulator running or your phone plugged in)
 
