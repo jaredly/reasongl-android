@@ -103,7 +103,7 @@ let module Gl
   };
 
   let getTimeMs = Capi.getTimeMs;
-  let render = (~window, ~mouseDown=?, ~mouseUp=?, ~mouseMove=?, ~keyDown=?, ~keyUp=?, ~windowResize=?, ~displayFunc, ()) => {
+  let render = (~window, ~mouseDown=?, ~mouseUp=?, ~mouseMove=?, ~keyDown=?, ~keyUp=?, ~windowResize=?, ~backPressed=?, ~displayFunc, ()) => {
     let showError = showError(Window.getContext(window));
     MLforJava.setUpdate((time) => {
       try {displayFunc(time /. 1000.0)} { | err => showError("update", err) }
@@ -115,6 +115,10 @@ let module Gl
     MLforJava.setTouchDrag(switch mouseMove {
     | None => (x, y) => ()
     | Some(fn) => (x, y) => try(fn(~x=int_of_float(x), ~y=int_of_float(y))) { | err => showError("mouseMove", err)}
+    });
+    MLforJava.setBackPressed(switch backPressed {
+    | None => () => false
+    | Some(fn) => () => try(fn()) { | err => {showError("backPressed", err); false}}
     });
     MLforJava.setTouchPress(switch mouseDown {
     | None => (x, y) => ()

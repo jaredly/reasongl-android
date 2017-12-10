@@ -39,11 +39,27 @@ JNI_METHOD(void, reasonglMain)(JNIEnv* env, jobject obj, jobject glView, jobject
   Field(ocamlWindow, 2) = (long)(*env)->NewGlobalRef(env, myAssetManager);
 
   CALL_OCAML_FN("reasonglMain", ocamlWindow);
+
   CAMLreturn0;
 }
 
 JNI_METHOD(void, reasonglUpdate)(JNIEnv* env, jobject obj, jdouble timeSinceLastDraw) {
   CALL_OCAML_FN("reasonglUpdate", caml_copy_double(timeSinceLastDraw));
+}
+
+JNI_METHOD(int, reasonglBackPressed)(JNIEnv* env, jobject obj, jdouble timeSinceLastDraw) {
+  CAMLparam0();
+  CAMLlocal1(res);
+  static value *ocaml_fn = NULL;
+  if (ocaml_fn == NULL) ocaml_fn = caml_named_value("reasonglBackPressed");
+  if (ocaml_fn == NULL) {
+    CAMLreturn(0);
+  } else {
+    LOGI("PRessing back");
+    res = caml_callback(*ocaml_fn, 0);
+    LOGI("Pressed back %d", Bool_val(res));
+    CAMLreturn(Bool_val(res));
+  }
 }
 
 JNI_METHOD(void, reasonglResize)(JNIEnv* env, jobject obj, jint width, jint height) {
