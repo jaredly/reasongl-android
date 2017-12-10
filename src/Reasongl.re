@@ -1,5 +1,4 @@
 let module Gl
-/* Uncomment this to see what still needs to be done */
 : RGLInterface.t
  = {
   include Bindings;
@@ -43,6 +42,8 @@ let module Gl
     };
   };
 
+  Printexc.record_backtrace(true);
+
   module type WindowT = {
     type t;
     let getWidth: t => int;
@@ -55,6 +56,10 @@ let module Gl
     let getContext: t => Capi.window;
   };
 
+  let showError = (ctx, where, err) => {
+    Capi.showAlert(~context=ctx, ~title="Exception in " ++ where, ~message=Printexc.to_string(err) ++ "\n" ++ Printexc.get_backtrace())
+  };
+
   module Window: WindowT = {
     type t = Capi.window;
     let getWidth = (window) => Capi.getWindowWidth(window);
@@ -65,6 +70,7 @@ let module Gl
     let getPixelScale = (window) => 1.;
 
     let setWindowSize = (~window, ~width, ~height) => {
+      failwith("Setting window size is not allowed on android. it will do weird things");
       /* umm this can't happen.
       one thing we could do is have an "intrinsic size" and a "real size",
       and this makes it so we scale whatever they're drawing to the actual
@@ -84,14 +90,7 @@ let module Gl
           /* setCurrentContext(context); */
         try {
           cb(Obj.magic(vc))
-        } {
-          | Failure(text) => {
-            Capi.logAndroid("Dying with failure: " ++ text)
-          }
-          | err => {
-            Capi.logAndroid("Dying with unknown exception")
-          }
-        }
+        } { | err => showError(vc, "setup", err) }
       })
     };
   };
@@ -103,33 +102,32 @@ let module Gl
     }
   };
 
-  /* let getTimeMs = () => 0.; */
   let getTimeMs = Capi.getTimeMs;
   let render = (~window, ~mouseDown=?, ~mouseUp=?, ~mouseMove=?, ~keyDown=?, ~keyUp=?, ~windowResize=?, ~displayFunc, ()) => {
+    let showError = showError(Window.getContext(window));
     MLforJava.setUpdate((time) => {
-      try {displayFunc(time /. 1000.0)} {
-      | Failure(text) => {
-        Capi.logAndroid("Dying in update with failure " ++ text)
-      }
-      | _ => {
-        Capi.logAndroid("Dying for unknown reaslong")
-      }
-      }
+      try {displayFunc(time /. 1000.0)} { | err => showError("update", err) }
+    });
+    MLforJava.setResize(switch windowResize {
+    | None => (x, y) => ()
+    | Some(fn) => (x, y) => try{fn()} { | err => showError("resize", err)}
     });
     MLforJava.setTouchDrag(switch mouseMove {
     | None => (x, y) => ()
-    | Some(fn) => (x, y) => ignore(fn(~x=int_of_float(x), ~y=int_of_float(y)))
+    | Some(fn) => (x, y) => try(fn(~x=int_of_float(x), ~y=int_of_float(y))) { | err => showError("mouseMove", err)}
     });
     MLforJava.setTouchPress(switch mouseDown {
     | None => (x, y) => ()
     | Some(fn) => (x, y) => {
       /* Capi.logAndroid("TOUCH"); */
-      ignore(fn(~button=Events.LeftButton, ~state=Events.MouseDown, ~x=int_of_float(x), ~y=int_of_float(y)))
+      try(fn(~button=Events.LeftButton, ~state=Events.MouseDown, ~x=int_of_float(x), ~y=int_of_float(y)))
+      { | err => showError("mouseDown", err)}
     }
     });
     MLforJava.setTouchRelease(switch mouseUp {
     | None => (x, y) => ()
-    | Some(fn) => (x, y) => ignore(fn(~button=Events.LeftButton, ~state=Events.MouseUp, ~x=int_of_float(x), ~y=int_of_float(y)))
+    | Some(fn) => (x, y) => try(fn(~button=Events.LeftButton, ~state=Events.MouseUp, ~x=int_of_float(x), ~y=int_of_float(y)))
+      { | err => showError("mouseUp", err)}
     });
   };
 
@@ -154,7 +152,7 @@ let module Gl
       Tgls_new.getShaderiv(~shader, ~pname=GLConstants.gl_delete_status)
     | Compile_status => Tgls_new.getShaderiv(~shader, ~pname=GLConstants.gl_compile_status)
     | Shader_type => Tgls_new.getShaderiv(~shader, ~pname=GLConstants.gl_shader_type)
-};
+  };
   let shaderSource = (~context, ~shader, ~source) => {
     Tgls_new.shaderSource(shader, [|source|])
   };

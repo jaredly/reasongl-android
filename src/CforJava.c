@@ -16,12 +16,12 @@
 
 #define CALL_OCAML_FN(name, arg) static value *ocaml_fn = NULL; \
   if (ocaml_fn == NULL) ocaml_fn = caml_named_value(name); \
-  if (ocaml_fn == NULL) LOGI("Function not assigned %s", name); \
+  if (ocaml_fn == NULL); /*LOGI("Function not assigned %s", name);*/ \
   else caml_callback(*ocaml_fn, arg);
 
 #define CALL_OCAML_FN2(name, arg1, arg2) static value *ocaml_fn = NULL; \
   if (ocaml_fn == NULL) ocaml_fn = caml_named_value(name); \
-  if (ocaml_fn == NULL) LOGI("Function not assigned %s", name); \
+  if (ocaml_fn == NULL); /*LOGI("Function not assigned %s", name);*/ \
   else caml_callback2(*ocaml_fn, arg1, arg2);
 
 
@@ -44,6 +44,10 @@ JNI_METHOD(void, reasonglMain)(JNIEnv* env, jobject obj, jobject glView, jobject
 
 JNI_METHOD(void, reasonglUpdate)(JNIEnv* env, jobject obj, jdouble timeSinceLastDraw) {
   CALL_OCAML_FN("reasonglUpdate", caml_copy_double(timeSinceLastDraw));
+}
+
+JNI_METHOD(void, reasonglResize)(JNIEnv* env, jobject obj, jint width, jint height) {
+  CALL_OCAML_FN2("reasonglResize", caml_copy_nativeint(width), caml_copy_nativeint(height));
 }
 
 JNI_METHOD(void, reasonglTouchPress)(JNIEnv* env, jobject obj, jdouble x, jdouble y) {

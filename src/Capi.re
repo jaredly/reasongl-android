@@ -1,11 +1,9 @@
 
-/* type jniEnv;
-type glView; */
 type window;
 type bitmap;
- /* = Window(jniEnv, glView); */
 
 external logAndroid : string => unit = "logAndroid";
+external showAlert : (~context: window, ~title: string, ~message: string) => unit = "showAlert";
 external getWindowHeight : window => int = "getWindowHeight";
 external getWindowWidth : window => int = "getWindowWidth";
 

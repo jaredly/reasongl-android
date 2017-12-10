@@ -24,11 +24,27 @@ void reasongl_init(void) {
     caml_startup(caml_argv);
 }
 
-void logAndroid(value text) {
+CAMLprim void logAndroid(value text) {
   CAMLparam1(text);
   char* str_text = String_val(text);
 
   __android_log_print(ANDROID_LOG_INFO, "reasongl", str_text);
+  CAMLreturn0;
+}
+
+CAMLprim void showAlert(value ocamlWindow, value title, value message) {
+  CAMLparam3(ocamlWindow, title, message);
+  JNIEnv* g_env = (JNIEnv*)(void *)Field(ocamlWindow, 0);
+  jobject g_pngmgr = (jobject)(void *)Field(ocamlWindow, 2);
+
+  jclass cls = (*g_env)->GetObjectClass(g_env, g_pngmgr);
+
+  jstring javaTitle = (*g_env)->NewStringUTF(g_env, String_val(title));
+  jstring javaMessage = (*g_env)->NewStringUTF(g_env, String_val(message));
+  jmethodID method = (*g_env)->GetMethodID(g_env, cls, "showAlert", "(Ljava/lang/String;Ljava/lang/String;)V");
+  (*g_env)->CallVoidMethod(g_env, g_pngmgr, method, javaTitle, javaMessage);
+
+  CAMLreturn0;
 }
 
 CAMLprim value getWindowHeight(value ocamlWindow) {
@@ -77,6 +93,7 @@ void texImage2DWithBitmap(value ocamlWindow, value target, value level, value bi
 
   jmethodID method = (*g_env)->GetMethodID(g_env, cls, "texImage2DWithBitmap", "(IILandroid/graphics/Bitmap;I)V");
   (*g_env)->CallVoidMethod(g_env, g_pngmgr, method, Int_val(target), Int_val(level), (jobject)(void*)bitmap, Int_val(border));
+  CAMLreturn0;
 }
 
 CAMLprim value loadImage(value ocamlWindow, value filename) {
@@ -153,6 +170,7 @@ void saveData(value ocamlWindow, value key, value data) {
 
   (*g_env)->CallVoidMethod(g_env, g_pngmgr, method, name, array);
   (*g_env)->DeleteLocalRef(g_env, name);
+  CAMLreturn0;
 }
 
 CAMLprim value loadData(value ocamlWindow, value key) {
@@ -176,7 +194,7 @@ CAMLprim value loadData(value ocamlWindow, value key) {
   } else {
     int len = (*g_env)->GetArrayLength(g_env, array);
     char buf[len];
-    (*g_env)->GetByteArrayRegion(g_env, array, 0, len, buf);
+    (*g_env)->GetByteArrayRegion(g_env, array, 0, len, (jbyte*)buf);
 
     // from https://www.linux-nantes.org/~fmonnier/OCaml/ocaml-wrapping-c.html
     ml_data = caml_alloc_string(len);
