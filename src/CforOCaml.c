@@ -9,7 +9,7 @@
 
 #include <android/log.h>
 #include <android/asset_manager_jni.h>
-#include <png.h>
+// #include <png.h>
 // #include <GLES3/gl3.h>
 #include <GLES2/gl2.h>
 
@@ -127,7 +127,9 @@ CAMLprim value loadFile(value ocamlWindow, value filename) {
   (*g_env)->DeleteLocalRef(g_env, name);
 
   if (contents) {
-    CAMLreturn(Val_some(caml_copy_string(contents)));
+    const char *nativeString = (*g_env)->GetStringUTFChars(g_env, contents, 0);
+    value result = Val_some(caml_copy_string(nativeString));
+    CAMLreturn(result);
   } else {
     CAMLreturn(Val_none);
   }
@@ -147,7 +149,7 @@ void saveData(value ocamlWindow, value key, value data) {
 
   int size = caml_string_length(data);
   jbyteArray array = (*g_env)->NewByteArray(g_env, size);
-  (*g_env)->SetByteArrayRegion(g_env, array, 0, size, String_val(data));
+  (*g_env)->SetByteArrayRegion(g_env, array, 0, size, (jbyte*)String_val(data));
 
   (*g_env)->CallVoidMethod(g_env, g_pngmgr, method, name, array);
   (*g_env)->DeleteLocalRef(g_env, name);

@@ -35,20 +35,10 @@ JNI_METHOD(void, reasonglMain)(JNIEnv* env, jobject obj, jobject glView, jobject
   ocamlWindow = caml_alloc_small(3, 0);
 
   Field(ocamlWindow, 0) = (long)env;
-  Field(ocamlWindow, 1) = (long)glView;
-  Field(ocamlWindow, 2) = (long)myAssetManager;
+  Field(ocamlWindow, 1) = (long)(*env)->NewGlobalRef(env, glView);
+  Field(ocamlWindow, 2) = (long)(*env)->NewGlobalRef(env, myAssetManager);
 
-  /*
-  jclass viewClass = (*env)->GetObjectClass(env, glView);
-  jmethodID getHeight = (*env)->GetMethodID(env, viewClass, "getHeight", "()I");
-  int height =  (*env)->CallIntMethod(env, glView, getHeight);
-
-  __android_log_print(ANDROID_LOG_INFO, "reasongl", "OCAML Hight %d", height);
-  */
-
-  LOGI("Before main");
   CALL_OCAML_FN("reasonglMain", ocamlWindow);
-  LOGI("After main");
   CAMLreturn0;
 }
 
