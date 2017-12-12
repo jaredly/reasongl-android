@@ -161,6 +161,11 @@ CAMLprim value TglReadPixels_RGBA(value x, value y, value width, value height) {
 
 void TglTexImage2D_RGBA_native(value target, value level, value width, value height, value border, value data) {
   glTexImage2D(Int_val(target), Int_val(level), 4, Int_val(width), Int_val(height), Int_val(border), GL_RGBA, GL_UNSIGNED_BYTE, Caml_ba_data_val(data));
+  // char datax[4] = {0, 0, 0, 0};
+  // glTexImage2D(Int_val(target), Int_val(level), 4, 1, 1, 0, GL_ARGB, GL_UNSIGNED_BYTE,
+  //   // Caml_ba_data_val(data)
+  //   datax
+  // );
 }
 
 void TglTexImage2D_RGBA_bytecode(value * argv, int argn) {

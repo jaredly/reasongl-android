@@ -8,6 +8,7 @@ external getWindowHeight : window => int = "getWindowHeight";
 external getWindowWidth : window => int = "getWindowWidth";
 
 external texImage2DWithBitmap : (~context: window, ~target: int, ~level: int, ~bitmap: bitmap, ~border: int) => unit = "texImage2DWithBitmap";
+external fillTextureWithColor : (~context: window, ~target: int, ~level: int, ~red: int, ~green: int, ~blue: int, ~alpha: int) => unit = "fillTextureWithColor_bytecode" "fillTextureWithColor_native";
 
 external saveData : (~context: window, ~key: string, ~value: bytes) => unit = "saveData";
 external loadData : (~context: window, ~key: string) => option(bytes) = "loadData";

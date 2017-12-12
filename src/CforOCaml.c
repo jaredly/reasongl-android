@@ -96,6 +96,25 @@ void texImage2DWithBitmap(value ocamlWindow, value target, value level, value bi
   CAMLreturn0;
 }
 
+void fillTextureWithColor_native(value ocamlWindow, value target, value level, value red, value green, value blue, value alpha) {
+  CAMLparam5(ocamlWindow, target, level, red, green);
+  CAMLxparam2(blue, alpha);
+
+  JNIEnv* g_env = (JNIEnv*)(void *)Field(ocamlWindow, 0);
+  jobject g_pngmgr = (jobject)(void *)Field(ocamlWindow, 2);
+
+  jclass cls = (*g_env)->GetObjectClass(g_env, g_pngmgr);
+
+  jmethodID method = (*g_env)->GetMethodID(g_env, cls, "fillTextureWithColor", "(IIIIII)V");
+  (*g_env)->CallVoidMethod(g_env, g_pngmgr, method, Int_val(target), Int_val(level), Int_val(red), Int_val(green), Int_val(blue), Int_val(alpha));
+
+  CAMLreturn0;
+}
+
+void fillTextureWithColor_bytecode(value * argv, int argn) {
+  fillTextureWithColor_native(argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], argv[6]);
+}
+
 CAMLprim value loadImage(value ocamlWindow, value filename) {
   CAMLparam2(ocamlWindow, filename);
   CAMLlocal1(record_image_data);

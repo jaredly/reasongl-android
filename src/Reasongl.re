@@ -103,6 +103,7 @@ let module Gl
   };
 
   let getTimeMs = Capi.getTimeMs;
+  let fillTextureWithColor = Capi.fillTextureWithColor;
   let render = (~window, ~mouseDown=?, ~mouseUp=?, ~mouseMove=?, ~keyDown=?, ~keyUp=?, ~windowResize=?, ~backPressed=?, ~displayFunc, ()) => {
     let showError = showError(Window.getContext(window));
     MLforJava.setUpdate((time) => {
