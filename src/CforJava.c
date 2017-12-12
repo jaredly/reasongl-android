@@ -12,7 +12,7 @@
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "reasongl",__VA_ARGS__)
 
-#define JNI_METHOD(returnType, name) JNIEXPORT returnType JNICALL Java_com_example_hellolibs_OCamlBindings_ ## name
+#define JNI_METHOD(returnType, name) JNIEXPORT returnType JNICALL Java_com_jaredforsyth_reasongl_OCamlBindings_ ## name
 
 #define CALL_OCAML_FN(name, arg) static value *ocaml_fn = NULL; \
   if (ocaml_fn == NULL) ocaml_fn = caml_named_value(name); \

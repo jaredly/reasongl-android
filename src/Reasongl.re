@@ -62,7 +62,9 @@ let module Gl
 
   module Window: WindowT = {
     type t = Capi.window;
-    let getPixelScale = (window) => Capi.getDevicePixelRatio(window);
+    let getPixelScale = (window) =>
+    /* 1.; */
+    Capi.getDevicePixelRatio(window);
     /* let getWidth = (window) => float_of_int(Capi.getWindowWidth(window)) *. getPixelScale(window) |> int_of_float;
     let getHeight = (window) => float_of_int(Capi.getWindowHeight(window)) *. getPixelScale(window) |> int_of_float; */
     /** TODO these are probably wrong */
