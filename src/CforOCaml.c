@@ -73,6 +73,20 @@ CAMLprim value getWindowWidth(value ocamlWindow) {
   // CAMLreturn(Val_int(500));
 }
 
+CAMLprim value getDevicePixelRatio(value ocamlWindow) {
+  CAMLparam1(ocamlWindow);
+  JNIEnv* g_env = (JNIEnv*)(void *)Field(ocamlWindow, 0);
+  jobject g_pngmgr = (jobject)(void *)Field(ocamlWindow, 2);
+
+  jclass cls = (*g_env)->GetObjectClass(g_env, g_pngmgr);
+  jfieldID field = (*g_env)->GetFieldID(g_env, cls, "pixelDensity", "D");
+  // jmethodID method = (*g_env)->GetMethodID(g_env, cls, "getDevicePixelRatio", "()D");
+  // double pixelRatio = (*g_env)->CallDoubleMethod(g_env, g_pngmgr, method);
+  double pixelRatio = (*g_env)->GetDoubleField(g_env, g_pngmgr, field);
+
+  CAMLreturn(caml_copy_double(pixelRatio));
+}
+
 #define Val_none Val_int(0)
 
 static value Val_some(value v) {

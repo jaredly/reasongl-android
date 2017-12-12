@@ -62,12 +62,14 @@ let module Gl
 
   module Window: WindowT = {
     type t = Capi.window;
-    let getWidth = (window) => Capi.getWindowWidth(window);
-    let getHeight = (window) => Capi.getWindowHeight(window);
+    let getPixelScale = (window) => Capi.getDevicePixelRatio(window);
+    /* let getWidth = (window) => float_of_int(Capi.getWindowWidth(window)) *. getPixelScale(window) |> int_of_float;
+    let getHeight = (window) => float_of_int(Capi.getWindowHeight(window)) *. getPixelScale(window) |> int_of_float; */
     /** TODO these are probably wrong */
-    let getPixelWidth = (window) => getWidth(window);
-    let getPixelHeight = (window) => getHeight(window);
-    let getPixelScale = (window) => 1.;
+    let getPixelWidth = (window) => Capi.getWindowWidth(window);
+    let getPixelHeight = (window) => Capi.getWindowHeight(window);
+    let getWidth = (window) => float_of_int(Capi.getWindowWidth(window)) /. getPixelScale(window) |> int_of_float;
+    let getHeight = window => float_of_int(Capi.getWindowHeight(window)) /. getPixelScale(window) |> int_of_float;
 
     let setWindowSize = (~window, ~width, ~height) => {
       failwith("Setting window size is not allowed on android. it will do weird things");
