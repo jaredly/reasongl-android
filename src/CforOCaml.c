@@ -185,7 +185,7 @@ CAMLprim value loadFile(value ocamlWindow, value filename) {
   }
 }
 
-void saveData(value ocamlWindow, value key, value data) {
+CAMLprim void saveData(value ocamlWindow, value key, value data) {
   CAMLparam3(ocamlWindow, key, data);
 
   JNIEnv* g_env = (JNIEnv*)(void *)Field(ocamlWindow, 0);
