@@ -5,6 +5,7 @@
 #include <caml/callback.h>
 #include <caml/bigarray.h>
 
+#include <sys/time.h>
 #include <android/log.h>
 #include <GLES2/gl2.h>
 #import <stdint.h>
@@ -22,7 +23,10 @@ void bigarray_unsafe_blit(value arr1, value arr2, value offset, value numOfBytes
 
 CAMLprim value getTimeMs() {
   CAMLparam0();
-  CAMLreturn(caml_copy_double(gettimeofday()));
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  double msec = ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
+  CAMLreturn(caml_copy_double(msec));
 }
 
 
