@@ -8,11 +8,7 @@ let module Gl
   type attributeT = Tgls_new.attribT;
 
   let target = "native-android";
-  module type FileT = {type t; let readFile: (~context: contextT, ~filename: string, ~cb: string => unit) => unit;
-    let saveUserData: (~context: contextT, ~key: string, ~value: 'a) => bool;
-    let loadUserData: (~context: contextT, ~key: string) => option('a);
-  };
-  module File: FileT = {
+  module File = {
     type t;
     let readFile = (~context, ~filename, ~cb) => {
       switch (Capi.loadFile(~context, ~filename)) {
@@ -44,25 +40,11 @@ let module Gl
 
   Printexc.record_backtrace(true);
 
-  module type WindowT = {
-    type t;
-    let getWidth: t => int;
-    let getHeight: t => int;
-    let getMaxWidth: t => int;
-    let getMaxHeight: t => int;
-    let getPixelWidth: t => int;
-    let getPixelHeight: t => int;
-    let getPixelScale: t => float;
-    let init: (~title: string=?, ~argv: array(string), (t) => unit) => unit;
-    let setWindowSize: (~window: t, ~width: int, ~height: int) => unit;
-    let getContext: t => Capi.window;
-  };
-
   let showError = (ctx, where, err) => {
     Capi.showAlert(~context=ctx, ~title="Exception in " ++ where, ~message=Printexc.to_string(err) ++ "\n" ++ Printexc.get_backtrace())
   };
 
-  module Window: WindowT = {
+  module Window = {
     type t = Capi.window;
     let getPixelScale = (window) =>
     /* 1.; */
@@ -79,13 +61,6 @@ let module Gl
 
     let setWindowSize = (~window, ~width, ~height) => {
       failwith("Setting window size is not allowed on android. it will do weird things");
-      /* umm this can't happen.
-      one thing we could do is have an "intrinsic size" and a "real size",
-      and this makes it so we scale whatever they're drawing to the actual
-      size of the phone.
-      But I don't love that idea.
-       */
-      ()
     };
 
     let getContext = t => t;
@@ -101,6 +76,12 @@ let module Gl
         } { | err => showError(vc, "setup", err) }
       })
     };
+  };
+
+  let module Audio = {
+    type t;
+    let loadSound = (window, path, callback) => failwith("Sound not supported on android");
+    let playSound = (window, sound, ~volume, ~loop) => failwith("Sound not supported on android");
   };
 
   let module Events: RGLEvents.t = {
