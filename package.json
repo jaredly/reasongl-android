@@ -1,0 +1,13 @@
+{
+  "name": "@jaredly/reasongl-android",
+  "version": "1.0.0",
+  "description": "Reason bindings to OpenGL for Android native",
+  "dependencies": {
+    "@jaredly/reasongl-interface": "1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jaredly/reasongl-android.git"
+  },
+  "author": "bsansouci & schmavery & jaredly"
+}
