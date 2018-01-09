@@ -18,19 +18,132 @@ import android.util.Log;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 public class MyAssetManager {
     private final AssetManager amgr;
     private final Context mContext;
     private final SharedPreferences mSharedPreferences;
+    private final ReasonGLView view;
     private boolean mShowingDialog = false;
     public double pixelDensity;
-    MyAssetManager(Context context, float pixelDensity) {
+
+    private boolean isListening = false;
+
+    MyAssetManager(Context context, float pixelDensity, final ReasonGLView view) {
+        this.view = view;
         this.amgr = context.getAssets();
         mContext = context;
         this.pixelDensity = pixelDensity;
         mSharedPreferences = context.getSharedPreferences("reasongl", MODE_PRIVATE);
     }
+
+    public void startHotReloading(final String host, final String baseFile) {
+        if (isListening) {
+            return;
+        };
+        isListening = true;
+        Thread thread = new Thread(new Runnable(){
+        @Override
+        public void run(){
+
+            Socket socket = null;
+            String response = "";
+            // "192.168.0.100"
+            try {
+                socket = new Socket(host, 8090);
+            } catch (UnknownHostException e) {
+                Log.e("reasongl", "No hot reloading server found");
+                return;
+            } catch (IOException e) {
+                Log.e("reasongl", "IO exception creating socket");
+            }
+
+            try {
+
+            String req = "android:" + baseFile + "\n";
+
+            OutputStream out = socket.getOutputStream();
+            out.write(req.getBytes());
+            out.flush();
+
+            Log.e("reasongl", "SOCKET C");
+            int bytesRead;
+            InputStream inputStream = socket.getInputStream();
+
+            ByteArrayOutputStream countStream = new ByteArrayOutputStream(20);
+            byte[] countBuffer = new byte[20];
+
+            while (true) {
+                Log.e("reasongl", "Starting a read");
+                byte b;
+                String collector = "";
+                while (true) {
+                    b = (byte)inputStream.read();
+                    if ((char)b == ':') {
+                        break;
+                    }
+                    collector += ((char)b);
+                }
+                int size = Integer.parseInt(collector);
+
+                ByteArrayOutputStream fileStream = new ByteArrayOutputStream(size);
+                byte[] fileBuffer = new byte[1024];
+
+                int total = 0;
+                while (total < size) {
+                    final int read = inputStream.read(fileBuffer);
+                    if (read == -1) {
+                        Log.e("reasongl", "Socket closed while reading body");
+                        return;
+                    }
+                    fileStream.write(fileBuffer, 0, read);
+                    total += read;
+                }
+                Log.e("reasongl", "FINISHED READING" + size);
+                // Log.e("reasongl", "AAAAAAAAAAAAAAAA Got a reponse:\n" + response);
+            }
+            } catch (IOException e) {
+                Log.e("reasongl", "IO Exception" + e);
+                return;
+            }
+
+            /*
+            * notice: inputStream.read() will block if no data return
+            */
+            // while ((bytesRead = inputStream.read(buffer)) != -1) {
+
+            //     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(1024);
+            //     byte[] buffer = new byte[1024];
+
+            //     Log.e("reasongl", "SOCKET E");
+            //     byteArrayOutputStream.write(buffer, 0, bytesRead);
+            //     response += byteArrayOutputStream.toString("UTF-8");
+            // }
+            // Log.e("reasongl", "SOCKET E");
+
+            // } catch (IOException e) {
+            //     // TODO Auto-generated catch block
+            //     e.printStackTrace();
+            //     response = "IOException: " + e.toString();
+            // } finally {
+            //     if (socket != null) {
+            //         try {
+            //             socket.close();
+            //         } catch (IOException e) {
+            //             // TODO Auto-generated catch block
+            //             e.printStackTrace();
+            //         }
+            //     }
+            // }
+        }
+        });
+        thread.start();
+    }
+
 
     public String readFileContents(String path) {
         try {

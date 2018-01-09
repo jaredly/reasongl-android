@@ -4,6 +4,7 @@ type bitmap;
 
 external logAndroid : string => unit = "logAndroid";
 external showAlert : (~context: window, ~title: string, ~message: string) => unit = "showAlert";
+external startHotReloading : (~context: window, ~host: string, ~baseFile: string) => unit = "startHotReloading";
 external getWindowHeight : window => int = "getWindowHeight";
 external getWindowWidth : window => int = "getWindowWidth";
 external getDevicePixelRatio : window => float = "getDevicePixelRatio";

@@ -47,6 +47,21 @@ CAMLprim void showAlert(value ocamlWindow, value title, value message) {
   CAMLreturn0;
 }
 
+CAMLprim void startHotReloading(value ocamlWindow, value host, value baseFile) {
+  CAMLparam3(ocamlWindow, host, baseFile);
+  JNIEnv* g_env = (JNIEnv*)(void *)Field(ocamlWindow, 0);
+  jobject g_pngmgr = (jobject)(void *)Field(ocamlWindow, 2);
+
+  jclass cls = (*g_env)->GetObjectClass(g_env, g_pngmgr);
+
+  jstring javaHost = (*g_env)->NewStringUTF(g_env, String_val(host));
+  jstring javaBaseFile = (*g_env)->NewStringUTF(g_env, String_val(baseFile));
+  jmethodID method = (*g_env)->GetMethodID(g_env, cls, "startHotReloading", "(Ljava/lang/String;Ljava/lang/String;)V");
+  (*g_env)->CallVoidMethod(g_env, g_pngmgr, method, javaHost, javaBaseFile);
+
+  CAMLreturn0;
+}
+
 CAMLprim value getWindowHeight(value ocamlWindow) {
   CAMLparam1(ocamlWindow);
   JNIEnv* env = (JNIEnv*)(void *)Field(ocamlWindow, 0);

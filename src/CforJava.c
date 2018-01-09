@@ -47,6 +47,11 @@ JNI_METHOD(void, reasonglUpdate)(JNIEnv* env, jobject obj, jdouble timeSinceLast
   CALL_OCAML_FN("reasonglUpdate", caml_copy_double(timeSinceLastDraw));
 }
 
+JNI_METHOD(void, reasonglHotReloaded)(JNIEnv* env, jstring filePath) {
+  const char *nativeString = (*env)->GetStringUTFChars(env, filePath, 0);
+  CALL_OCAML_FN("reasonglHotReloaded", caml_copy_string(nativeString));
+}
+
 JNI_METHOD(int, reasonglBackPressed)(JNIEnv* env, jobject obj, jdouble timeSinceLastDraw) {
   CAMLparam0();
   CAMLlocal1(res);

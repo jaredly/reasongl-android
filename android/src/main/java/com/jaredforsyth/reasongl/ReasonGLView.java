@@ -29,10 +29,10 @@ public class ReasonGLView extends GLSurfaceView {
         GLSurfaceView view;
         Context context;
 
-        public Renderer(GLSurfaceView view, Context context, float pixelDensity) {
+        public Renderer(ReasonGLView view, Context context, float pixelDensity) {
             super();
 
-            mMyAssetManager = new MyAssetManager(context, pixelDensity);
+            mMyAssetManager = new MyAssetManager(context, pixelDensity, view);
             this.view = view;
             this.context = context;
             view.setEGLContextClientVersion(2);
@@ -109,6 +109,16 @@ public class ReasonGLView extends GLSurfaceView {
                 if (!mRenderer.bindings.reasonglBackPressed()) {
                     new Handler(getMainLooper()).post(superBackPressed);
                 }
+            }
+        });
+    }
+
+    public void onHotReload(final String filePath) {
+        // I probably want to rotate through several file names so I don't step on the previous one?
+        this.queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                mRenderer.bindings.reasonglHotReloaded(filePath);
             }
         });
     }

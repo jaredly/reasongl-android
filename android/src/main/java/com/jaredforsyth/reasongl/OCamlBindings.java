@@ -13,6 +13,8 @@ public class OCamlBindings {
     public native void reasonglTouchDrag(double x, double y);
     public native void reasonglTouchRelease(double x, double y);
 
+    public native void reasonglHotReloaded(String filePath);
+
     static {
         System.loadLibrary("reasongl");
     }
