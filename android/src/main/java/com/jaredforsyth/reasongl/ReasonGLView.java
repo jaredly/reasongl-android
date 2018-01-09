@@ -114,11 +114,13 @@ public class ReasonGLView extends GLSurfaceView {
     }
 
     public void onHotReload(final String filePath) {
+        final ReasonGLView view = this;
         // I probably want to rotate through several file names so I don't step on the previous one?
         this.queueEvent(new Runnable() {
             @Override
             public void run() {
                 mRenderer.bindings.reasonglHotReloaded(filePath);
+                mRenderer.bindings.reasonglMain(view, mRenderer.mMyAssetManager);
             }
         });
     }

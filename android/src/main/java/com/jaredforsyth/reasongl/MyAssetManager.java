@@ -22,6 +22,7 @@ import java.io.OutputStream;
 
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.net.ConnectException;
 
 public class MyAssetManager {
     private final AssetManager amgr;
@@ -56,56 +57,72 @@ public class MyAssetManager {
             try {
                 socket = new Socket(host, 8090);
             } catch (UnknownHostException e) {
-                Log.e("reasongl", "No hot reloading server found");
+                Log.e("reasongl", "Bad host: " + e);
+                view.onHotReload("/sdcard/hot.cma");
+                return;
+            } catch (ConnectException e) {
+                Log.e("reasongl", "No hot reload server running: " + e);
+                view.onHotReload("/sdcard/hot.cma");
                 return;
             } catch (IOException e) {
-                Log.e("reasongl", "IO exception creating socket");
+                Log.e("reasongl", "IO exception creating socket: " + e);
+                view.onHotReload("/sdcard/hot.cma");
+                return;
             }
 
             try {
+                String req = "android:" + baseFile + "\n";
 
-            String req = "android:" + baseFile + "\n";
-
-            OutputStream out = socket.getOutputStream();
-            out.write(req.getBytes());
-            out.flush();
-
-            Log.e("reasongl", "SOCKET C");
-            int bytesRead;
-            InputStream inputStream = socket.getInputStream();
-
-            ByteArrayOutputStream countStream = new ByteArrayOutputStream(20);
-            byte[] countBuffer = new byte[20];
-
-            while (true) {
-                Log.e("reasongl", "Starting a read");
-                byte b;
-                String collector = "";
-                while (true) {
-                    b = (byte)inputStream.read();
-                    if ((char)b == ':') {
-                        break;
-                    }
-                    collector += ((char)b);
-                }
-                int size = Integer.parseInt(collector);
-
-                ByteArrayOutputStream fileStream = new ByteArrayOutputStream(size);
-                byte[] fileBuffer = new byte[1024];
-
-                int total = 0;
-                while (total < size) {
-                    final int read = inputStream.read(fileBuffer);
-                    if (read == -1) {
-                        Log.e("reasongl", "Socket closed while reading body");
-                        return;
-                    }
-                    fileStream.write(fileBuffer, 0, read);
-                    total += read;
-                }
-                Log.e("reasongl", "FINISHED READING" + size);
-                // Log.e("reasongl", "AAAAAAAAAAAAAAAA Got a reponse:\n" + response);
+                OutputStream out = socket.getOutputStream();
+                out.write(req.getBytes());
+                out.flush();
+            } catch (IOException e) {
+                return;
             }
+
+            if (true) {
+                view.onHotReload("/sdcard/hot.cma");
+                return;
+            }
+
+            try {
+                Log.e("reasongl", "SOCKET C");
+                int bytesRead;
+                InputStream inputStream = socket.getInputStream();
+
+                ByteArrayOutputStream countStream = new ByteArrayOutputStream(20);
+                byte[] countBuffer = new byte[20];
+
+                while (true) {
+                    Log.e("reasongl", "Starting a read");
+                    byte b;
+                    String collector = "";
+                    while (true) {
+                        b = (byte)inputStream.read();
+                        if ((char)b == ':') {
+                            break;
+                        }
+                        collector += ((char)b);
+                    }
+                    int size = Integer.parseInt(collector);
+
+                    ByteArrayOutputStream fileStream = new ByteArrayOutputStream(size);
+                    byte[] fileBuffer = new byte[1024];
+
+                    int total = 0;
+                    while (total < size) {
+                        final int read = inputStream.read(fileBuffer);
+                        if (read == -1) {
+                            Log.e("reasongl", "Socket closed while reading body");
+                            return;
+                        }
+                        fileStream.write(fileBuffer, 0, read);
+                        total += read;
+                    }
+                    Log.e("reasongl", "FINISHED READING" + size);
+                    view.onHotReload("/sdcard/hot.cma");
+                    // Log.e("reasongl", "AAAAAAAAAAAAAAAA Got a reponse:\n" + response);
+                }
             } catch (IOException e) {
                 Log.e("reasongl", "IO Exception" + e);
                 return;
