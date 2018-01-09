@@ -21,6 +21,7 @@ import javax.microedition.khronos.opengles.GL10;
 public class ReasonGLView extends GLSurfaceView {
     private final Context mContext;
     private final Renderer mRenderer;
+    private boolean firstReload = true;
 
     private static class Renderer implements GLSurfaceView.Renderer {
         OCamlBindings bindings = new OCamlBindings();
@@ -115,12 +116,16 @@ public class ReasonGLView extends GLSurfaceView {
 
     public void onHotReload(final String filePath) {
         final ReasonGLView view = this;
+        final boolean firstReload = this.firstReload;
+        this.firstReload = false;
         // I probably want to rotate through several file names so I don't step on the previous one?
         this.queueEvent(new Runnable() {
             @Override
             public void run() {
                 mRenderer.bindings.reasonglHotReloaded(filePath);
-                mRenderer.bindings.reasonglMain(view, mRenderer.mMyAssetManager);
+                if (firstReload) {
+                    mRenderer.bindings.reasonglMain(view, mRenderer.mMyAssetManager);
+                }
             }
         });
     }

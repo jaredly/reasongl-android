@@ -19,6 +19,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.*;
 
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -58,15 +59,15 @@ public class MyAssetManager {
                 socket = new Socket(host, 8090);
             } catch (UnknownHostException e) {
                 Log.e("reasongl", "Bad host: " + e);
-                view.onHotReload("/sdcard/hot.cma");
+                // view.onHotReload("/sdcard/hot.cma");
                 return;
             } catch (ConnectException e) {
                 Log.e("reasongl", "No hot reload server running: " + e);
-                view.onHotReload("/sdcard/hot.cma");
+                // view.onHotReload("/sdcard/hot.cma");
                 return;
             } catch (IOException e) {
                 Log.e("reasongl", "IO exception creating socket: " + e);
-                view.onHotReload("/sdcard/hot.cma");
+                // view.onHotReload("/sdcard/hot.cma");
                 return;
             }
 
@@ -77,13 +78,14 @@ public class MyAssetManager {
                 out.write(req.getBytes());
                 out.flush();
             } catch (IOException e) {
+                Log.e("reasongl", "Failed to send who I am");
                 return;
             }
 
-            if (true) {
-                view.onHotReload("/sdcard/hot.cma");
-                return;
-            }
+            // if (true) {
+            //     view.onHotReload("/sdcard/hot.cma");
+            //     return;
+            // }
 
             try {
                 Log.e("reasongl", "SOCKET C");
@@ -120,7 +122,15 @@ public class MyAssetManager {
                         total += read;
                     }
                     Log.e("reasongl", "FINISHED READING" + size);
-                    view.onHotReload("/sdcard/hot.cma");
+                    File outputDir = mContext.getCacheDir();
+                    File outputFile = File.createTempFile("hot", "cma", outputDir);
+                    byte[] bytes = fileStream.toByteArray();
+                    FileOutputStream f = new FileOutputStream(outputFile);
+                    f.write(bytes);
+                    f.close();
+                    // view.onHotReload("/sdcard/hot.cma");
+                    Log.e("reasongl", outputFile.getPath());
+                    view.onHotReload(outputFile.getPath());
                     // Log.e("reasongl", "AAAAAAAAAAAAAAAA Got a reponse:\n" + response);
                 }
             } catch (IOException e) {

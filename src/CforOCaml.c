@@ -70,6 +70,7 @@ CAMLprim value getWindowHeight(value ocamlWindow) {
   jclass viewClass = (*env)->GetObjectClass(env, glView);
   jmethodID getHeight = (*env)->GetMethodID(env, viewClass, "getHeight", "()I");
   int height =  (*env)->CallIntMethod(env, glView, getHeight);
+  LOGI("========= window height %d", height);
 
   CAMLreturn(Val_int(height));
   // CAMLreturn(Val_int(1000));
@@ -81,10 +82,11 @@ CAMLprim value getWindowWidth(value ocamlWindow) {
   jobject glView = (jobject)(void *)Field(ocamlWindow, 1);
 
   jclass viewClass = (*env)->GetObjectClass(env, glView);
-  jmethodID getHeight = (*env)->GetMethodID(env, viewClass, "getWidth", "()I");
-  int height =  (*env)->CallIntMethod(env, glView, getHeight);
+  jmethodID getWidth = (*env)->GetMethodID(env, viewClass, "getWidth", "()I");
+  int width =  (*env)->CallIntMethod(env, glView, getWidth);
+  LOGI("========= window width %d", width);
 
-  CAMLreturn(Val_int(height));
+  CAMLreturn(Val_int(width));
   // CAMLreturn(Val_int(500));
 }
 
@@ -99,6 +101,7 @@ CAMLprim value getDevicePixelRatio(value ocamlWindow) {
   // double pixelRatio = (*g_env)->CallDoubleMethod(g_env, g_pngmgr, method);
   double pixelRatio = (*g_env)->GetDoubleField(g_env, g_pngmgr, field);
 
+  LOGI("========= pixel density %f", pixelRatio);
   CAMLreturn(caml_copy_double(pixelRatio));
 }
 

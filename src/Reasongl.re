@@ -54,8 +54,12 @@ let module Gl
     /** TODO these are probably wrong */
     let getPixelWidth = (window) => Capi.getWindowWidth(window);
     let getPixelHeight = (window) => Capi.getWindowHeight(window);
-    let getWidth = (window) => float_of_int(Capi.getWindowWidth(window)) /. getPixelScale(window) |> int_of_float;
-    let getHeight = window => float_of_int(Capi.getWindowHeight(window)) /. getPixelScale(window) |> int_of_float;
+    let getWidth = (window) => float_of_int(Capi.getWindowWidth(window))
+     /. getPixelScale(window)
+     |> int_of_float;
+    let getHeight = window => float_of_int(Capi.getWindowHeight(window))
+    /. getPixelScale(window)
+    |> int_of_float;
     let getMaxWidth = getWidth;
     let getMaxHeight = getHeight;
 
