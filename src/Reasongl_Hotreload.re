@@ -15,7 +15,7 @@ let checkRebuild = (filePath) => {
       }
     });
     MLforJava.setMain(context => {
-      Capi.startHotReloading(~context, ~host="192.168.0.100", ~baseFile=filePath);
+      Capi.startHotReloading(~context, ~host=[%env ("LOCAL_IP", "127.0.0.1")], ~baseFile=filePath);
     });
   }
 };
