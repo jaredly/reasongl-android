@@ -11,6 +11,8 @@ import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.List;
+import java.util.ArrayList;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -57,6 +59,16 @@ public class ReasonGLView extends GLSurfaceView {
         }
     }
 
+    private static double[] getPointerList(final MotionEvent event, final float density) {
+        double[] pointers = new double[event.getPointerCount() * 3];
+        for (int i=0; i<event.getPointerCount(); i++) {
+          pointers[i * 3] = (double)event.getPointerId(i);
+          pointers[i * 3 + 1] = (double)event.getX(i) / density;
+          pointers[i * 3 + 2] = (double)event.getY(i) / density;
+        }
+        return pointers;
+    }
+
     public ReasonGLView(Activity context) {
         super(context);
         mContext = context;
@@ -77,21 +89,24 @@ public class ReasonGLView extends GLSurfaceView {
                         self.queueEvent(new Runnable() {
                             @Override
                             public void run() {
-                                bindings.reasonglTouchPress(event.getX() / density, event.getY()/ density);
+                                bindings.reasonglTouchPress(getPointerList(event, density));
+                                // bindings.reasonglTouchPress(event.getX() / density, event.getY()/ density);
                             }
                         });
                     } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
                         self.queueEvent(new Runnable() {
                             @Override
                             public void run() {
-                                bindings.reasonglTouchDrag(event.getX() / density, event.getY() / density);
+                                bindings.reasonglTouchDrag(getPointerList(event, density));
+                                // bindings.reasonglTouchDrag(event.getX() / density, event.getY() / density);
                             }
                         });
                     } else if (event.getAction() == MotionEvent.ACTION_UP) {
                         self.queueEvent(new Runnable() {
                             @Override
                             public void run() {
-                                bindings.reasonglTouchRelease(event.getX() / density, event.getY() / density);
+                                bindings.reasonglTouchRelease(getPointerList(event, density));
+                                // bindings.reasonglTouchRelease(event.getX() / density, event.getY() / density);
                             }
                         });
                     }

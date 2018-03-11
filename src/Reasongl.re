@@ -7,6 +7,7 @@ let module Gl
   type programT = Tgls_new.programT;
   type attributeT = Tgls_new.attribT;
 
+  let isTouchScreen = true;
   let target = "native-android";
   module File = {
     type t;
@@ -97,7 +98,7 @@ let module Gl
 
   let getTimeMs = Capi.getTimeMs;
   let fillTextureWithColor = Capi.fillTextureWithColor;
-  let render = (~window, ~mouseDown=?, ~mouseUp=?, ~mouseMove=?, ~keyDown=?, ~keyUp=?, ~windowResize=?, ~backPressed=?, ~displayFunc, ()) => {
+  let render = (~window, ~mouseDown=?, ~mouseUp=?, ~mouseMove=?, ~touchStart=?, ~touchMove=?, ~touchEnd=?, ~keyDown=?, ~keyUp=?, ~windowResize=?, ~backPressed=?, ~displayFunc, ()) => {
     let showError = showError(Window.getContext(window));
     MLforJava.setUpdate((time) => {
       try {displayFunc(time /. 1000.0)} { | err => showError("update", err) }
@@ -107,25 +108,53 @@ let module Gl
     | Some(fn) => (x, y) => try{fn()} { | err => showError("resize", err)}
     });
     MLforJava.setTouchDrag(switch mouseMove {
-    | None => (x, y) => ()
-    | Some(fn) => (x, y) => try(fn(~x=int_of_float(x), ~y=int_of_float(y))) { | err => showError("mouseMove", err)}
+    | None => switch touchMove {
+      | None => (touches) => ()
+      | Some(fn) => { touches => fn(~touches) }
+    }
+    | Some(fn) => (touches) => {
+      switch touchMove {
+      | None => ()
+      | Some(fn) => fn(~touches)
+      };
+      let (_, x, y) = List.hd(touches);
+      try(fn(~x=int_of_float(x), ~y=int_of_float(y))) { | err => showError("mouseMove", err)}
+    }
     });
     MLforJava.setBackPressed(switch backPressed {
     | None => () => false
     | Some(fn) => () => try(fn()) { | err => {showError("backPressed", err); false}}
     });
     MLforJava.setTouchPress(switch mouseDown {
-    | None => (x, y) => ()
-    | Some(fn) => (x, y) => {
+    | None => switch touchStart {
+      | None => (touches) => ()
+      | Some(fn) => { touches => fn(~touches) }
+    }
+    | Some(fn) => (touches) => {
+      switch touchStart {
+      | None => ()
+      | Some(fn) => fn(~touches)
+      };
       /* Capi.logAndroid("TOUCH"); */
+      let (_, x, y) = List.hd(touches);
       try(fn(~button=Events.LeftButton, ~state=Events.MouseDown, ~x=int_of_float(x), ~y=int_of_float(y)))
       { | err => showError("mouseDown", err)}
     }
     });
     MLforJava.setTouchRelease(switch mouseUp {
-    | None => (x, y) => ()
-    | Some(fn) => (x, y) => try(fn(~button=Events.LeftButton, ~state=Events.MouseUp, ~x=int_of_float(x), ~y=int_of_float(y)))
+    | None => switch touchEnd {
+      | None => (touches) => ()
+      | Some(fn) => { touches => fn(~touches) }
+    }
+    | Some(fn) => (touches) => {
+      switch touchEnd {
+      | None => ()
+      | Some(fn) => fn(~touches)
+      };
+      let (_, x, y) = List.hd(touches);
+      try(fn(~button=Events.LeftButton, ~state=Events.MouseUp, ~x=int_of_float(x), ~y=int_of_float(y)))
       { | err => showError("mouseUp", err)}
+    }
     });
   };
 

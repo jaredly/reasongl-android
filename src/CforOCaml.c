@@ -68,6 +68,7 @@ CAMLprim value getWindowHeight(value ocamlWindow) {
   jobject glView = (jobject)(void *)Field(ocamlWindow, 1);
 
   jclass viewClass = (*env)->GetObjectClass(env, glView);
+  // TODO account for the hardware buttons
   jmethodID getHeight = (*env)->GetMethodID(env, viewClass, "getHeight", "()I");
   int height =  (*env)->CallIntMethod(env, glView, getHeight);
   LOGI("========= window height %d", height);
