@@ -110,11 +110,77 @@ JNI_METHOD(void, reasonglTouchPress)(JNIEnv* env, jobject obj, jdoubleArray touc
   CAMLreturn0;
 }
 
-JNI_METHOD(void, reasonglTouchDrag)(JNIEnv* env, jobject obj, jdouble touches) {
+JNI_METHOD(void, reasonglTouchDrag)(JNIEnv* env, jobject obj, jdoubleArray touches) {
+  CAMLparam0();
+  CAMLlocal3(cli, cons, element);
+
+  jboolean isCopy1;
+  jdouble* touchDoubles = (*env)->GetDoubleArrayElements(env, touches, &isCopy1);
+  int len = (*env)->GetArrayLength(env, touches);
+  int i;
+
+  cli = Val_emptylist;
+
+  for (i = len - 1; i >= 0; i-=3)
+  {
+      element = caml_alloc(3, 0);
+
+      jdouble y =  touchDoubles[i];
+      jdouble x =  touchDoubles[i - 1];
+      jdouble id =  touchDoubles[i - 2];
+
+      Store_field(element, 0, caml_copy_double(id));
+      Store_field(element, 1, caml_copy_double(x));
+      Store_field(element, 2, caml_copy_double(y));
+
+      cons = caml_alloc(2, 0);
+      Store_field( cons, 0, element );  // head
+      Store_field( cons, 1, cli );              // tail
+
+      cli = cons;
+  }
+
+  (*env)->ReleaseDoubleArrayElements(env, touches, touchDoubles, 0);
   // CALL_OCAML_FN2("reasonglTouchDrag", caml_copy_double(x), caml_copy_double(y));
+  CALL_OCAML_FN("reasonglTouchDrag", cli);
+
+  CAMLreturn0;
 }
 
-JNI_METHOD(void, reasonglTouchRelease)(JNIEnv* env, jobject obj, jdouble touches) {
+JNI_METHOD(void, reasonglTouchRelease)(JNIEnv* env, jobject obj, jdoubleArray touches) {
+  CAMLparam0();
+  CAMLlocal3(cli, cons, element);
+
+  jboolean isCopy1;
+  jdouble* touchDoubles = (*env)->GetDoubleArrayElements(env, touches, &isCopy1);
+  int len = (*env)->GetArrayLength(env, touches);
+  int i;
+
+  cli = Val_emptylist;
+
+  for (i = len - 1; i >= 0; i-=3)
+  {
+      element = caml_alloc(3, 0);
+
+      jdouble y =  touchDoubles[i];
+      jdouble x =  touchDoubles[i - 1];
+      jdouble id =  touchDoubles[i - 2];
+
+      Store_field(element, 0, caml_copy_double(id));
+      Store_field(element, 1, caml_copy_double(x));
+      Store_field(element, 2, caml_copy_double(y));
+
+      cons = caml_alloc(2, 0);
+      Store_field( cons, 0, element );  // head
+      Store_field( cons, 1, cli );              // tail
+
+      cli = cons;
+  }
+
+  (*env)->ReleaseDoubleArrayElements(env, touches, touchDoubles, 0);
   // CALL_OCAML_FN2("reasonglTouchRelease", caml_copy_double(x), caml_copy_double(y));
+  CALL_OCAML_FN("reasonglTouchRelease", cli);
+
+  CAMLreturn0;
 }
 

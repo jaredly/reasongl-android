@@ -69,6 +69,15 @@ public class ReasonGLView extends GLSurfaceView {
         return pointers;
     }
 
+    private static double[] getActionPointerList(final MotionEvent event, final float density) {
+        double[] pointers = new double[3];
+        int index = event.getActionIndex();
+        pointers[0] = (double)event.getPointerId(index);
+        pointers[1] = (double)event.getX(index) / density;
+        pointers[2] = (double)event.getY(index) / density;
+        return pointers;
+    }
+
     public ReasonGLView(Activity context) {
         super(context);
         mContext = context;
@@ -85,27 +94,47 @@ public class ReasonGLView extends GLSurfaceView {
             @Override
             public boolean onTouch(View v, final MotionEvent event) {
                 if (event != null) {
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                        final double[] pointers = getPointerList(event, density);
                         self.queueEvent(new Runnable() {
                             @Override
                             public void run() {
-                                bindings.reasonglTouchPress(getPointerList(event, density));
+                                bindings.reasonglTouchPress(pointers);
                                 // bindings.reasonglTouchPress(event.getX() / density, event.getY()/ density);
                             }
                         });
-                    } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                    } else if (event.getActionMasked() == MotionEvent.ACTION_POINTER_DOWN) {
+                        final double[] pointers = getActionPointerList(event, density);
                         self.queueEvent(new Runnable() {
                             @Override
                             public void run() {
-                                bindings.reasonglTouchDrag(getPointerList(event, density));
+                                bindings.reasonglTouchPress(pointers);
+                            }
+                        });
+                    } else if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
+                        final double[] pointers = getPointerList(event, density);
+                        self.queueEvent(new Runnable() {
+                            @Override
+                            public void run() {
+                                bindings.reasonglTouchDrag(pointers);
                                 // bindings.reasonglTouchDrag(event.getX() / density, event.getY() / density);
                             }
                         });
-                    } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    } else if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+                        final double[] pointers = getPointerList(event, density);
                         self.queueEvent(new Runnable() {
                             @Override
                             public void run() {
-                                bindings.reasonglTouchRelease(getPointerList(event, density));
+                                bindings.reasonglTouchRelease(pointers);
+                                // bindings.reasonglTouchRelease(event.getX() / density, event.getY() / density);
+                            }
+                        });
+                    } else if (event.getActionMasked() == MotionEvent.ACTION_POINTER_UP) {
+                        final double[] pointers = getActionPointerList(event, density);
+                        self.queueEvent(new Runnable() {
+                            @Override
+                            public void run() {
+                                bindings.reasonglTouchRelease(pointers);
                                 // bindings.reasonglTouchRelease(event.getX() / density, event.getY() / density);
                             }
                         });

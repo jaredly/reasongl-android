@@ -113,12 +113,12 @@ let module Gl
       | Some(fn) => { touches => fn(~touches) }
     }
     | Some(fn) => (touches) => {
+      let (_, x, y) = List.hd(touches);
+      try(fn(~x=int_of_float(x), ~y=int_of_float(y))) { | err => showError("mouseMove", err)};
       switch touchMove {
       | None => ()
       | Some(fn) => fn(~touches)
       };
-      let (_, x, y) = List.hd(touches);
-      try(fn(~x=int_of_float(x), ~y=int_of_float(y))) { | err => showError("mouseMove", err)}
     }
     });
     MLforJava.setBackPressed(switch backPressed {
@@ -131,14 +131,15 @@ let module Gl
       | Some(fn) => { touches => fn(~touches) }
     }
     | Some(fn) => (touches) => {
+      /* Capi.logAndroid("TOUCH"); */
+      let (_, x, y) = List.hd(touches);
+      try(fn(~button=Events.LeftButton, ~state=Events.MouseDown, ~x=int_of_float(x), ~y=int_of_float(y)))
+      { | err => showError("mouseDown", err)};
+      Capi.logAndroid("Down: " ++ (List.map(((a, b, c)) => Printf.sprintf("%0.2f %0.2f %0.2f", a, b, c), touches) |> String.concat(" - ")));
       switch touchStart {
       | None => ()
       | Some(fn) => fn(~touches)
       };
-      /* Capi.logAndroid("TOUCH"); */
-      let (_, x, y) = List.hd(touches);
-      try(fn(~button=Events.LeftButton, ~state=Events.MouseDown, ~x=int_of_float(x), ~y=int_of_float(y)))
-      { | err => showError("mouseDown", err)}
     }
     });
     MLforJava.setTouchRelease(switch mouseUp {
@@ -147,13 +148,14 @@ let module Gl
       | Some(fn) => { touches => fn(~touches) }
     }
     | Some(fn) => (touches) => {
+      let (_, x, y) = List.hd(touches);
+      try(fn(~button=Events.LeftButton, ~state=Events.MouseUp, ~x=int_of_float(x), ~y=int_of_float(y)))
+      { | err => showError("mouseUp", err)};
+      Capi.logAndroid("Release: " ++ (List.map(((a, b, c)) => Printf.sprintf("%0.2f %0.2f %0.2f", a, b, c), touches) |> String.concat(" - ")));
       switch touchEnd {
       | None => ()
       | Some(fn) => fn(~touches)
       };
-      let (_, x, y) = List.hd(touches);
-      try(fn(~button=Events.LeftButton, ~state=Events.MouseUp, ~x=int_of_float(x), ~y=int_of_float(y)))
-      { | err => showError("mouseUp", err)}
     }
     });
   };
